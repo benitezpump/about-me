@@ -20,6 +20,11 @@ return [
     'content_cache_ttl' => (int) env('CONTENT_CACHE_TTL', 60),
 
     /*
+    | Zona horaria que define cuándo empieza un "día" en el contador de visitas.
+    */
+    'stats_timezone' => env('STATS_TIMEZONE', 'America/Hermosillo'),
+
+    /*
     | Administrador inicial (`php artisan admin:ensure`). Se leen aquí, no con env() en los comandos: con `config:cache`
     | (producción) env() fuera de los archivos de configuración devuelve null.
     */

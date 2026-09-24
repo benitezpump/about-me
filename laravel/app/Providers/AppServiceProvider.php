@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Services\ViewCounter;
 use App\Support\TrustProxy;
+use InvalidArgumentException;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Event;
@@ -15,7 +17,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(ViewCounter::class, fn () => new ViewCounter((string) config('security.stats_timezone')));
     }
 
     /**
@@ -25,6 +27,11 @@ class AppServiceProvider extends ServiceProvider
     {
         // Un TRUST_PROXY inválido debe fallar al arrancar, no confiar a ciegas en cabeceras que el visitante controla.
         TrustProxy::parse(config('security.trust_proxy'));
+
+        $zone = (string) config('security.stats_timezone');
+        if (! in_array($zone, timezone_identifiers_list(), true)) {
+            throw new InvalidArgumentException("STATS_TIMEZONE no es una zona horaria válida: \"{$zone}\" (ejemplo: America/Hermosillo).");
+        }
 
         // Marca este navegador al iniciar sesión para que las visitas del propio administrador al sitio no cuenten.
         // No identifica a nadie: es solo un "1". Dura un año.
