@@ -1,0 +1,56 @@
+{% extends "admin/layout.njk" %}
+{% block title %}Importar y exportar · Administración{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Importar y exportar</h1>
+    <p class="muted">Todo el contenido del sitio en un solo archivo JSON: sirve de respaldo y para llevarlo a otra base.</p>
+  </div>
+</div>
+
+<h2>Exportar</h2>
+<p class="help data-note">
+  Descarga el contenido actual: perfil, herramientas, empleos, proyectos, docencia, estudios y certificaciones. No incluye
+  usuarios, contraseñas ni estadísticas de visitas.
+</p>
+<p><a class="btn" href="/admin/data/export" download>Descargar contenido (JSON)</a></p>
+
+<h2>Importar</h2>
+<p class="help data-note">
+  Reemplaza <strong>todo</strong> el contenido actual por el del archivo. Se revisa completo antes de guardar y se aplica de una
+  sola vez: si algo no es válido, no cambia nada. Descarga una exportación antes por si quieres volver atrás.
+</p>
+
+{% if issues.length %}
+<div class="error error-box" role="alert">
+  <p><strong>No se importó nada.</strong> Corrige esto en el archivo e inténtalo de nuevo:</p>
+  <ul class="issue-list">
+    {% for i in issues %}<li>{{ i }}</li>{% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+<form method="post" action="/admin/data/import" class="form" data-confirm="Esto reemplaza todo el contenido actual del sitio. ¿Continuar?">
+  <input type="hidden" name="_csrf" value="{{ csrf }}">
+
+  <div class="field">
+    <label for="file">Archivo .json</label>
+    <input id="file" type="file" accept=".json,application/json" data-load-into="data">
+    <p class="help">El archivo se lee en tu navegador y su texto aparece abajo, donde puedes revisarlo antes de importar.</p>
+  </div>
+
+  <div class="field">
+    <label for="data">Contenido</label>
+    <textarea id="data" name="data" rows="14" class="code-area" spellcheck="false" autocomplete="off" required>{{ text }}</textarea>
+  </div>
+
+  <div class="field field-check">
+    <label for="confirm"><input id="confirm" type="checkbox" name="confirm" value="1" required> Entiendo que esto reemplaza todo el contenido actual</label>
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn">Importar y reemplazar</button>
+  </div>
+</form>
+{% endblock %}

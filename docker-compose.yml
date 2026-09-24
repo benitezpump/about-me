@@ -1,0 +1,43 @@
+services:
+  # Base de datos local. Solo arranca con COMPOSE_PROFILES=local-db (ver .env.example).
+  # Si ya tienes tu propia base PostgreSQL, no actives ese perfil y define DATABASE_URL en .env.
+  db:
+    profiles: ["local-db"]
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: about_me
+      POSTGRES_USER: about_me
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U about_me -d about_me"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    # Sin `ports`: la base solo es accesible desde la app, no desde tu red.
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+        required: false   # sin el perfil local-db, la app usa la base externa
+    environment:
+      NODE_ENV: production
+      # Tu DATABASE_URL del .env tiene prioridad; si no existe, usa la base local del perfil local-db.
+      DATABASE_URL: ${DATABASE_URL:-postgres://about_me:${POSTGRES_PASSWORD:-}@db:5432/about_me}
+      DB_POOL_MAX: ${DB_POOL_MAX:-10}
+      RUN_MIGRATIONS: ${RUN_MIGRATIONS:-true}
+      SEED_ON_EMPTY: "true"
+      ADMIN_USERNAME: ${ADMIN_USERNAME:?Define ADMIN_USERNAME en .env}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Define ADMIN_PASSWORD en .env}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      TRUST_PROXY: ${TRUST_PROXY:-false}
+    ports:
+      - "${APP_PORT:-3000}:3000"
+
+volumes:
+  pgdata:

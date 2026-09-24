@@ -1,0 +1,24 @@
+{% extends "admin/layout.njk" %}
+{% block title %}Entrar · Administración{% endblock %}
+
+{% block chrome %}
+<main class="login">
+  <h1>Administración</h1>
+  <p class="login-hint">Entra para editar el contenido del sitio.</p>
+
+  {% if error %}<p class="error error-box" role="alert">{{ error }}</p>{% endif %}
+
+  <form method="post" action="/admin/login" class="form">
+    <input type="hidden" name="_csrf" value="{{ csrf }}">
+    <div class="field">
+      <label for="username">Usuario</label>
+      <input id="username" name="username" type="text" value="{{ username }}" autocomplete="username" autocapitalize="none" spellcheck="false" required autofocus>
+    </div>
+    <div class="field">
+      <label for="password">Contraseña</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" required>
+    </div>
+    <button type="submit" class="btn">Entrar</button>
+  </form>
+</main>
+{% endblock %}

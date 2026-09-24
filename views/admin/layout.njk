@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="dark light">
+<script src="/static/js/theme-init.js"></script>
+<title>{% block title %}Administración{% endblock %}</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400..900&family=JetBrains+Mono:wght@400..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/site.css?v={{ assetVersion }}">
+<link rel="stylesheet" href="/static/css/admin.css?v={{ assetVersion }}">
+</head>
+<body class="admin">
+{% block chrome %}
+<header class="admin-top">
+  <div class="admin-bar">
+    <a class="admin-brand" href="/admin">Administración</a>
+    <div class="admin-bar-actions">
+      <a href="/" target="_blank" rel="noopener noreferrer">Ver sitio<span class="sr-only"> (se abre en una pestaña nueva)</span></a>
+      <a href="/admin/account"{% if current == 'account' %} aria-current="page"{% endif %}>{{ admin.username }}</a>
+      <form method="post" action="/admin/logout">
+        <input type="hidden" name="_csrf" value="{{ csrf }}">
+        <button type="submit" class="link-button">Salir</button>
+      </form>
+    </div>
+  </div>
+</header>
+
+<div class="admin-shell">
+  <nav class="admin-nav" aria-label="Contenido">
+    <a href="/admin"{% if current == 'dashboard' %} aria-current="page"{% endif %}>Panel</a>
+    {% for item in nav %}
+    <a href="/admin/{{ item.slug }}"{% if current == item.slug %} aria-current="page"{% endif %}>{{ item.label }}</a>
+    {% endfor %}
+    <a href="/admin/data"{% if current == 'data' %} aria-current="page"{% endif %}>Importar y exportar</a>
+  </nav>
+
+  <main class="admin-main" id="contenido">
+    {% if flash %}<p class="flash" role="status">{{ flash }}</p>{% endif %}
+    {% if flashError %}<p class="flash flash-error" role="alert">{{ flashError }}</p>{% endif %}
+    {% block content %}{% endblock %}
+  </main>
+</div>
+{% endblock %}
+<script src="/static/js/admin.js?v={{ assetVersion }}" defer></script>
+</body>
+</html>

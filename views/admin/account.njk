@@ -1,0 +1,37 @@
+{% extends "admin/layout.njk" %}
+{% block title %}Cuenta · Administración{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Cuenta</h1>
+    <p class="muted">Sesión iniciada como {{ admin.username }}.</p>
+  </div>
+</div>
+
+<h2>Cambiar contraseña</h2>
+<form method="post" action="/admin/account" class="form">
+  <input type="hidden" name="_csrf" value="{{ csrf }}">
+
+  <div class="field{% if errors.current %} has-error{% endif %}">
+    <label for="current">Contraseña actual</label>
+    <input id="current" name="current" type="password" autocomplete="current-password" required>
+    {% if errors.current %}<p class="error" role="alert">{{ errors.current }}</p>{% endif %}
+  </div>
+  <div class="field{% if errors.next %} has-error{% endif %}">
+    <label for="next">Contraseña nueva</label>
+    <input id="next" name="next" type="password" autocomplete="new-password" minlength="{{ minLength }}" required>
+    <p class="help">Mínimo {{ minLength }} caracteres. Al cambiarla se cierran tus otras sesiones.</p>
+    {% if errors.next %}<p class="error" role="alert">{{ errors.next }}</p>{% endif %}
+  </div>
+  <div class="field{% if errors.confirm %} has-error{% endif %}">
+    <label for="confirm">Repite la contraseña nueva</label>
+    <input id="confirm" name="confirm" type="password" autocomplete="new-password" required>
+    {% if errors.confirm %}<p class="error" role="alert">{{ errors.confirm }}</p>{% endif %}
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn">Cambiar contraseña</button>
+  </div>
+</form>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "admin/layout.njk" %}
+{% block title %}{{ res.label }} · Administración{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{{ res.label }}</h1>
+    <p class="muted">{{ res.description }}</p>
+  </div>
+  <a class="btn" href="/admin/{{ res.slug }}/new">Agregar {{ res.singular }}</a>
+</div>
+
+{% if rows.length %}
+<div class="table-wrap">
+  <table class="table">
+    <thead>
+      <tr>
+        {% for col in res.columns %}<th scope="col">{{ col.label }}</th>{% endfor %}
+        <th scope="col"><span class="sr-only">Acciones</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        {% for col in res.columns %}
+        <td{% if loop.first %} data-primary{% endif %}>{% if loop.first %}<a href="/admin/{{ res.slug }}/{{ row.id }}">{{ row[col.key] | cell }}</a>{% else %}{{ row[col.key] | cell }}{% endif %}</td>
+        {% endfor %}
+        <td class="actions"><a href="/admin/{{ res.slug }}/{{ row.id }}">Editar</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="empty">Todavía no hay nada aquí. <a href="/admin/{{ res.slug }}/new">Agrega {{ res.singular }}</a> para que aparezca en el sitio.</p>
+{% endif %}
+{% endblock %}

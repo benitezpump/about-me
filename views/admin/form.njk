@@ -1,0 +1,95 @@
+{% extends "admin/layout.njk" %}
+{% block title %}{% if isNew %}Agregar {{ res.singular }}{% else %}{{ res.label }}{% endif %} · Administración{% endblock %}
+
+{% macro control(f, name, id, value, options) -%}
+  {%- if f.type == 'textarea' -%}
+    <textarea id="{{ id }}" name="{{ name }}" rows="{{ 5 if (f.max or 0) > 600 else 3 }}"{% if f.max %} maxlength="{{ f.max }}"{% endif %}{% if f.required %} required{% endif %}>{{ value }}</textarea>
+  {%- elif f.type == 'paragraphs' -%}
+    <textarea id="{{ id }}" name="{{ name }}" rows="9"{% if f.max %} maxlength="{{ f.max }}"{% endif %}{% if f.required %} required{% endif %}>{{ value }}</textarea>
+  {%- elif f.type == 'select' -%}
+    <select id="{{ id }}" name="{{ name }}"{% if f.required %} required{% endif %}>
+      {%- if not f.required %}<option value="">Sin elegir</option>{% endif %}
+      {%- for o in options %}<option value="{{ o.value }}"{% if o.value == value %} selected{% endif %}>{{ o.label }}</option>{% endfor %}
+    </select>
+  {%- elif f.type == 'checkbox' -%}
+    <input id="{{ id }}" type="checkbox" name="{{ name }}" value="1"{% if value %} checked{% endif %}>
+  {%- elif f.type == 'number' -%}
+    <input id="{{ id }}" type="number" step="1" name="{{ name }}" value="{{ value }}"{% if f.min is defined %} min="{{ f.min }}"{% endif %}{% if f.max is defined %} max="{{ f.max }}"{% endif %}{% if f.required %} required{% endif %}>
+  {%- elif f.type == 'date' -%}
+    <input id="{{ id }}" type="date" name="{{ name }}" value="{{ value }}"{% if f.required %} required{% endif %}>
+  {%- elif f.type == 'url' -%}
+    <input id="{{ id }}" type="text" inputmode="url" name="{{ name }}" value="{{ value }}" spellcheck="false" maxlength="2000"{% if f.required %} required{% endif %}>
+  {%- else -%}
+    <input id="{{ id }}" type="text" name="{{ name }}" value="{{ value }}" maxlength="{{ f.max or 300 }}"{% if f.required %} required{% endif %}>
+  {%- endif -%}
+{%- endmacro %}
+
+{% macro childRow(c, row, i) -%}
+<li class="child-row" data-row>
+  <div class="child-fields">
+    {%- for f in c.fields %}
+    <label class="child-label"><span>{{ f.label }}{% if f.required %} <span class="req" aria-hidden="true">*</span>{% endif %}</span>
+      {{ control(f, 'children[' ~ c.key ~ '][' ~ i ~ '][' ~ f.name ~ ']', '', row[f.name], c.options[f.name]) }}
+    </label>
+    {%- endfor %}
+  </div>
+  <div class="child-actions">
+    <button type="button" class="icon-button" data-up aria-label="Subir">↑</button>
+    <button type="button" class="icon-button" data-down aria-label="Bajar">↓</button>
+    <button type="button" class="link-button danger" data-remove>Quitar</button>
+  </div>
+</li>
+{%- endmacro %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{% if res.singleton %}{{ res.label }}{% elif isNew %}Agregar {{ res.singular }}{% else %}Editar {{ res.singular }}{% endif %}</h1>
+    <p class="muted">{{ res.description }}</p>
+  </div>
+  {% if not res.singleton %}<a href="/admin/{{ res.slug }}">Volver a {{ res.label | lower }}</a>{% endif %}
+</div>
+
+{% if formError %}<p class="error error-box" role="alert">{{ formError }}</p>{% endif %}
+
+<form method="post" class="form" action="{% if res.singleton %}/admin/profile{% elif isNew %}/admin/{{ res.slug }}{% else %}/admin/{{ res.slug }}/{{ id }}{% endif %}">
+  <input type="hidden" name="_csrf" value="{{ csrf }}">
+
+  {% for f in fields %}
+  <div class="field{% if f.error %} has-error{% endif %}{% if f.type == 'checkbox' %} field-check{% endif %}">
+    {% if f.type == 'checkbox' %}
+      <label for="{{ f.id }}">{{ control(f, f.name, f.id, f.value, f.options) }} <span>{{ f.label }}</span></label>
+    {% else %}
+      <label for="{{ f.id }}">{{ f.label }}{% if f.required %} <span class="req" aria-hidden="true">*</span>{% endif %}</label>
+      {{ control(f, f.name, f.id, f.value, f.options) }}
+    {% endif %}
+    {% if f.help %}<p class="help">{{ f.help }}</p>{% endif %}
+    {% if f.error %}<p class="error" role="alert">{{ f.error }}</p>{% endif %}
+  </div>
+  {% endfor %}
+
+  {% for c in children %}
+  <fieldset class="children" data-children="{{ c.key }}">
+    <legend>{{ c.label }}</legend>
+    {% if c.error %}<p class="error" role="alert">{{ c.error }}</p>{% endif %}
+    <ol class="child-rows" data-rows>
+      {%- for row in c.rows %}{{ childRow(c, row, loop.index0) }}{% endfor %}
+    </ol>
+    <template data-template>{{ childRow(c, {}, '__i__') }}</template>
+    <button type="button" class="btn-secondary" data-add>Agregar {{ c.itemLabel }}</button>
+  </fieldset>
+  {% endfor %}
+
+  <div class="form-actions">
+    <button type="submit" class="btn">Guardar</button>
+    {% if not res.singleton %}<a href="/admin/{{ res.slug }}">Cancelar</a>{% endif %}
+  </div>
+</form>
+
+{% if not isNew and not res.singleton %}
+<form method="post" action="/admin/{{ res.slug }}/{{ id }}/delete" class="danger-zone" data-confirm="¿Eliminar este registro? No se puede deshacer.">
+  <input type="hidden" name="_csrf" value="{{ csrf }}">
+  <button type="submit" class="link-button danger">Eliminar {{ res.singular }}</button>
+</form>
+{% endif %}
+{% endblock %}

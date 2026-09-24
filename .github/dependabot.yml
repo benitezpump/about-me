@@ -1,0 +1,53 @@
+# Actualizaciones automáticas: llegan como solicitudes de cambio que la integración continua (ci.yml) prueba solas.
+# Las reglas `ignore` no son descuido, son decisiones (ver docs/decisions/0001-arquitectura-y-alcance-del-panel.md).
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "07:00"
+      timezone: America/Hermosillo
+    open-pull-requests-limit: 5
+    groups:
+      # Los parches y menores se agrupan en una sola solicitud para no recibir una por paquete.
+      npm-menores-y-parches:
+        update-types: [minor, patch]
+    ignore:
+      # TypeScript se queda en 5.9 a propósito: 7.x es un cambio mayor recién publicado. Se revisa a mano.
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
+      # Los tipos deben coincidir con el Node de producción (22), no con el último.
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: America/Hermosillo
+
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: America/Hermosillo
+    ignore:
+      # Producción va en la línea LTS de Node 22; un salto de versión se decide, no llega solo.
+      - dependency-name: node
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: docker-compose
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: America/Hermosillo
+    ignore:
+      # NUNCA automático: un cambio de versión mayor de PostgreSQL exige exportar e importar los datos.
+      - dependency-name: postgres
+        update-types: ["version-update:semver-major"]
