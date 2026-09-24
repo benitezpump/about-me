@@ -1,7 +1,12 @@
 <?php
 
+use App\Support\DatabaseSsl;
 use Illuminate\Support\Str;
 use Pdo\Mysql;
+
+// Conexión cifrada y verificada (Supabase): con DATABASE_SSL_CA se verifica el servidor y su nombre. Ver App\Support\DatabaseSsl.
+$databaseCa = DatabaseSsl::parseCa(env('DATABASE_SSL_CA'));
+$databaseUrl = env('DB_URL', env('DATABASE_URL'));
 
 return [
 
@@ -86,7 +91,7 @@ return [
 
         'pgsql' => [
             'driver' => 'pgsql',
-            'url' => env('DB_URL'),
+            'url' => $databaseCa ? DatabaseSsl::withoutSslMode($databaseUrl) : $databaseUrl,
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '5432'),
             'database' => env('DB_DATABASE', 'laravel'),
@@ -96,7 +101,8 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
             'search_path' => 'public',
-            'sslmode' => env('DB_SSLMODE', 'prefer'),
+            'sslmode' => $databaseCa ? 'verify-full' : env('DB_SSLMODE', 'prefer'),
+            'sslrootcert' => $databaseCa ? DatabaseSsl::materialize($databaseCa) : null,
         ],
 
         'sqlsrv' => [

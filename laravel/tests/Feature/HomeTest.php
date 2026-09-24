@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Services\SiteContent;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Tests\Support\Fixture;
@@ -81,6 +82,7 @@ class HomeTest extends TestCase
         DB::table('courses')->delete();
         DB::table('workshops')->delete();
         DB::table('experiences')->where('kind', 'teaching')->delete();
+        SiteContent::forget(); // SQL directo: se salta los modelos, así que se invalida a mano
         $sin = $this->home();
         $this->assertStringNotContainsString('id="docencia"', $sin);
         $this->assertStringNotContainsString('href="#docencia"', $sin, 'y sale también de la navegación');

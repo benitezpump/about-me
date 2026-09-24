@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\ForgetsSiteContent;
 use Illuminate\Database\Eloquent\Model;
 use App\Casts\PgTextArray;
 
@@ -12,6 +13,8 @@ use App\Casts\PgTextArray;
  */
 class Profile extends Model
 {
+    use ForgetsSiteContent;
+
     public $timestamps = false;
 
     protected $guarded = [];

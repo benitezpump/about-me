@@ -11,6 +11,8 @@ use App\Models\Profile;
 use App\Models\Project;
 use App\Models\ToolGroup;
 use App\Support\Format;
+use Illuminate\Contracts\Cache\LockTimeoutException;
+use Illuminate\Support\Facades\Cache;
 use RuntimeException;
 
 /**
@@ -23,6 +25,71 @@ use RuntimeException;
  */
 class SiteContent
 {
+    private const KEY = 'site.content';
+
+    private const GENERATION = 'site.content.generation';
+
+    /**
+     * Contenido público con caché (por defecto 60 s). Cada edición desde el panel la invalida (`forget`). Garantías:
+     *  - una sola carga a la vez: si expira y llegan muchas peticiones juntas, se carga una vez, no una por petición;
+     *  - sin datos obsoletos: si una edición invalida la caché mientras hay una carga en curso, el resultado de esa carga
+     *    (que pudo leer antes de la edición) no se guarda;
+     *  - un error de carga no se cachea: la siguiente petición reintenta.
+     * Se guarda como JSON, no como objetos PHP: `cache.serializable_classes` de Laravel prohíbe deserializar objetos.
+     *
+     * @return array<string, mixed>
+     */
+    public function get(): array
+    {
+        $ttl = (int) config('security.content_cache_ttl', 60);
+        if ($ttl <= 0) {
+            return $this->load();
+        }
+
+        if (($hit = $this->read()) !== null) {
+            return $hit;
+        }
+
+        try {
+            return Cache::lock(self::KEY.'.lock', 15)->block(5, fn () => $this->read() ?? $this->loadAndStore($ttl));
+        } catch (LockTimeoutException) {
+            return $this->load(); // otra petición tarda demasiado: se sirve sin esperar y sin cachear
+        }
+    }
+
+    /** Descarta el contenido en caché y cualquier carga que haya empezado antes de esta llamada. */
+    public static function forget(): void
+    {
+        Cache::increment(self::GENERATION);
+        Cache::forget(self::KEY);
+    }
+
+    /** @return array<string, mixed>|null */
+    private function read(): ?array
+    {
+        $json = Cache::get(self::KEY);
+
+        return is_string($json) ? $this->decode($json) : null;
+    }
+
+    /** @return array<string, mixed> */
+    private function loadAndStore(int $ttl): array
+    {
+        $generation = (int) Cache::get(self::GENERATION, 0);
+        $content = $this->load();
+        if ($generation === (int) Cache::get(self::GENERATION, 0)) {
+            Cache::put(self::KEY, json_encode($content, JSON_THROW_ON_ERROR), $ttl);
+        }
+
+        return $this->decode(json_encode($content, JSON_THROW_ON_ERROR));
+    }
+
+    /** @return array<string, mixed> */
+    private function decode(string $json): array
+    {
+        return (array) json_decode($json, false, 512, JSON_THROW_ON_ERROR);
+    }
+
     /** @return array<string, mixed> */
     public function load(): array
     {

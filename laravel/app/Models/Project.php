@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\ForgetsSiteContent;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -13,6 +14,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Project extends Model
 {
+    use ForgetsSiteContent;
+
     public $timestamps = false;
 
     protected $guarded = [];
