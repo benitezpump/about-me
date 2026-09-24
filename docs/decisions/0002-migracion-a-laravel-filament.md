@@ -1,6 +1,6 @@
 # 0002. Migración a Laravel + Filament
 
-- **Estado:** en curso (fase 0 completada en la rama `laravel`)
+- **Estado:** implementada en la rama `laravel` (fases 0 a 6). **Pendiente de verificar fuera de esta máquina:** la imagen de Docker, `docker-compose.yml`, la integración continua, Render y Supabase (nunca se han ejecutado).
 - **Fecha:** 2026-09-24
 - **Decide:** Carlos Benítez.
 - **Relación con el ADR 0001:** lo reemplaza en su parte de arquitectura ("conservar Fastify + Nunjucks") y **cumple su plan
@@ -17,11 +17,10 @@ y solo se reorganiza. Laravel es el stack principal del autor en su trabajo, y F
 
 ## Decisión
 
-Migrar a **Laravel 13 (PHP ≥ 8.3) + Filament 5**, en la carpeta `laravel/` de la rama `laravel`, sin tocar la app Node hasta
-que la nueva la iguale. Al cortar, `laravel/` sube a la raíz y la app Node se archiva.
+Migrar a **Laravel 13 (PHP ≥ 8.3, se usa 8.4) + Filament 5**. Se desarrolló en `laravel/` sin tocar la app Node hasta que la nueva la igualó; **al cortar, `laravel/` subió a la raíz y la app Node se archivó** en la etiqueta `node-legacy` (`git show node-legacy:src/app.ts`), fuera del árbol.
 
-- **Base de datos: la misma.** Laravel adopta el esquema SQL existente (`laravel/database/sql/*.sql`, copia de
-  `db/migrations/`). Una sola migración de Laravel los aplica con el mismo registro (`schema_migrations`) que usa la app
+- **Base de datos: la misma.** Laravel adopta el esquema SQL existente (`database/sql/*.sql`, copiados de
+  `db/migrations/` de la app Node). Una sola migración de Laravel los aplica con el mismo registro (`schema_migrations`) que usa la app
   Node: sobre una base ya migrada no repite nada y **las dos aplicaciones pueden convivir sobre la misma base**. El esquema
   no se reescribe con el constructor de Laravel (restricciones `NOT VALID`, llaves compuestas y RLS no caben en él).
 - **MVC**: modelos Eloquent (`app/Models`), servicio que arma el contenido (`app/Services/SiteContent.php`, el "modelo de
@@ -43,26 +42,35 @@ que la nueva la iguale. Al cortar, `laravel/` sube a la raíz y la app Node se a
 
 | # | Fase | Estado |
 |---|---|---|
-| 0 | Esqueleto, adopción del esquema, `/healthz`, portada, favicon | **hecha** (34 pruebas; HTML idéntico al de Node) |
-| 1 | Cabeceras de seguridad (CSP, HSTS), `TRUST_PROXY`, conexión con CA (`DATABASE_SSL_CA`), caché de contenido con invalidación | pendiente |
-| 2 | Panel Filament: acceso de un solo administrador, recursos (perfil, tecnologías, herramientas, experiencias, proyectos, materias, talleres, estudios, certificaciones, enlaces), límite de intentos de login | pendiente |
-| 3 | Importar y exportar JSON (validador y prueba de cobertura de columnas) + contenido inicial de ejemplo | pendiente |
-| 4 | Contador de visitas con privacidad (hash diario, `notrack`, DNT/GPC, robots) | pendiente |
-| 5 | Dockerfile (PHP-FPM + nginx o FrankenPHP), `render.yaml`, integración continua con PostgreSQL | pendiente |
-| 6 | Corte: subir `laravel/` a la raíz, archivar la app Node, actualizar guías | pendiente |
+| 0 | Esqueleto, adopción del esquema, `/healthz`, portada, favicon | **hecha** (HTML idéntico al de Node sobre la misma base) |
+| 1 | Cabeceras de seguridad (CSP, HSTS), `TRUST_PROXY`, conexión con CA (`DATABASE_SSL_CA`), caché de contenido con invalidación | **hecha** (verificada con `libpq` contra un servidor TLS con CA propia) |
+| 2 | Panel Filament: un solo administrador, 12 recursos, límite de intentos de login, cambio de contraseña | **hecha** (verificada en Edge real) |
+| 3 | Importar y exportar JSON (validador, cobertura de columnas, serializador idéntico al de Node al byte) + contenido de ejemplo | **hecha** (verificada en Edge real) |
+| 4 | Contador de visitas con privacidad (hash diario, `notrack`, DNT/GPC, robots) y tablero | **hecha** (verificada en Edge real) |
+| 6 | Corte: `laravel/` sube a la raíz, la app Node se archiva en `node-legacy` | **hecha** (se hizo **antes** que la 5 para escribir el despliegue una sola vez sobre la estructura final) |
+| 5 | Dockerfile (FrankenPHP), `docker-compose.yml`, `render.yaml`, integración continua con PostgreSQL, guías | **escrita**; piezas verificadas por separado (arranque en frío contra una base vacía, cachés de producción, humo HTTP, esquema de Render); **la imagen y la CI nunca se han ejecutado** |
 
 ## Consecuencias
 
 **Buenas:** estructura por convención; panel mantenido por terceros; menos código propio sensible.
 
-**Malas, y aceptadas:** se reescribe y se reverifica la seguridad; se pierde TypeScript estricto; la imagen de Docker es
-más pesada; hay que mantener PHP y Composer además de Node mientras convivan.
+**Malas, y aceptadas:** se reescribió y se reverificó la seguridad; se pierde TypeScript estricto; la imagen de Docker es
+más pesada; el hash `scrypt` del administrador de la app anterior no se puede verificar en PHP (se recrea desde el
+entorno, una vez).
 
 ## Riesgos abiertos
 
-- **Nada de esto se ha ejecutado en Docker, Render ni GitHub Actions** (la app Node tampoco). La fase 5 lo cubre.
-- **Sesiones y autenticación:** la tabla `sessions` y `admin_users` de la app Node tienen otro formato que las de Laravel.
-  Se resolverá en la fase 2 (tablas propias de Laravel con otro nombre; el administrador se recrea desde variables de
-  entorno, sin migrar contraseñas).
+- **Nada de esto se ha ejecutado en Docker, Render ni GitHub Actions** (la app Node tampoco). La primera ejecución de
+  `.github/workflows/ci.yml` (trabajo `docker`) es lo que valida la imagen.
+- **FrankenPHP en lugar de nginx + php-fpm:** se cambió lo que se había anunciado porque es UN proceso y un archivo de
+  configuración corto (menos piezas que puedan fallar sin poder probarlas). Sus etiquetas de imagen y el `Caddyfile` no se
+  han probado; la alternativa es `serversideup/php` (nginx + php-fpm) si algo falla.
+- **Sesiones y autenticación:** resuelto. Las tablas `sessions` y `admin_users` de la app Node tenían otro formato que las de
+  Laravel: se usan `web_sessions` (propia) y `admin_users` con `password_hash` bcrypt; `admin:ensure` reemplaza **una vez** un
+  hash `scrypt` heredado con `ADMIN_PASSWORD`. La tabla `sessions` vieja queda sin uso.
+- **`verify-full` contra Supabase:** comprueba también el nombre del servidor; no se pudo confirmar que coincida con el del
+  pooler. Escape documentado: `DB_SSLMODE=verify-ca`.
+- **CSP del panel:** Filament (Livewire/Alpine) exige `unsafe-inline` y `unsafe-eval` en `script-src` para `/admin`. Es una
+  concesión acotada a esas rutas (el sitio público conserva la CSP estricta) y una prueba la vigila.
 - **`migrate:fresh` no elimina funciones de PostgreSQL:** por eso las pruebas reinician el esquema `public` de una base
   desechable (`tests/TestCase.php`).

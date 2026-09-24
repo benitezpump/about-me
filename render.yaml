@@ -1,13 +1,15 @@
-# Blueprint de Render para about-me: un servicio web construido con el Dockerfile del proyecto. La base de datos vive en
-# Supabase, así que aquí NO se crea ninguna base en Render. Render lo lee de la raíz del repositorio
-# (Dashboard → New → Blueprint). Guía completa: README, "Desplegar en Render".
+# Blueprint de Render para about-me: un servicio web construido con el Dockerfile del proyecto (Laravel + Filament sobre
+# FrankenPHP). La base de datos vive en Supabase, así que aquí NO se crea ninguna base en Render. Render lo lee de la raíz
+# del repositorio (Dashboard → New → Blueprint). Guía completa: README, "Desplegar en Render".
 #
-# Validado contra el esquema oficial (https://render.com/schema/render.yaml.json) con scripts/validate-render.py,
-# que también corre en la integración continua.
+# Validado contra el esquema oficial (https://render.com/schema/render.yaml.json) con scripts/validate-render.py, que también
+# corre en la integración continua.
 #
 # Costo: el servicio usa un plan de pago a propósito. El gratuito se duerme tras 15 minutos sin visitas y tarda cerca de
 # un minuto en despertar; para un portafolio que verá un reclutador, la primera impresión sería una espera de un minuto.
 # Para probar sin gastar, cambia `plan: starter` por `plan: free`.
+#
+# ¡Este Blueprint y la imagen que construye NO se han ejecutado nunca en Render! Verifica el primer despliegue (README).
 
 services:
   - type: web
@@ -27,31 +29,36 @@ services:
     # renderSubdomainPolicy: disabled   # el sitio dejaría de responder en *.onrender.com
 
     envVars:
-      - key: NODE_ENV
+      - key: APP_ENV
         value: production
-      - key: DB_POOL_MAX
-        value: "5"
+      - key: APP_DEBUG
+        value: "false" # NUNCA true en producción: mostraría variables de entorno y consultas en las páginas de error
       - key: RUN_MIGRATIONS
-        value: "true"
+        value: "true" # migra el esquema al arrancar (con bloqueo: dos instancias no migran a la vez)
       - key: SEED_ON_EMPTY
-        value: "true" # el primer arranque carga el contenido inicial si la base está vacía; después no vuelve a hacerlo
-      - key: COOKIE_SECURE
-        value: "true" # Render termina el HTTPS: el navegador siempre ve https
+        # El primer arranque carga el contenido de EJEMPLO si la base está vacía (tu content.json no está en el
+        # repositorio); después no vuelve a hacerlo. Importa tu propio JSON desde /admin → Importar y exportar.
+        value: "true"
+      - key: SESSION_SECURE_COOKIE
+        value: "true" # Render termina el HTTPS: el navegador siempre ve https (cookies Secure y HSTS)
       - key: TRUST_PROXY
         # Cuántos proxies de confianza hay delante de la app. NO uses `true`: dejaría a un visitante elegir su propia IP
         # y evadir el límite de intentos de login. Empieza en 1 y VERIFÍCALO tras el primer despliegue (README).
         value: "1"
 
       # --- Secretos: Render los pide en el panel al crear el Blueprint; no se guardan en este archivo ---------------
+      - key: APP_KEY
+        # Cifra las cookies y las sesiones. Genérala en tu equipo con `php artisan key:generate --show` (empieza con
+        # `base64:`) y pégala aquí. Si la cambias, se cierran todas las sesiones abiertas.
+        sync: false
       - key: DATABASE_URL
         # La URL del "Session pooler" de Supabase (puerto 5432 del host `…pooler.supabase.com`, usuario
         # `postgres.<ref>`). NO la conexión directa (solo IPv6, y Render no sale por IPv6) ni el modo transacción
-        # (puerto 6543): pierde los bloqueos de sesión que usan las migraciones. Contiene tu contraseña.
+        # (puerto 6543): rompe las sentencias preparadas de PDO. Contiene tu contraseña.
         sync: false
       - key: DATABASE_SSL_CA
         # El certificado de la CA de Supabase (Database settings → SSL Configuration → Download certificate), completo.
-        # Es un certificado público. Con él la conexión se cifra Y se verifica al servidor; sin él, `sslmode=require`
-        # falla con "unable to verify the first certificate" (README).
+        # Es un certificado público. Con él la conexión se cifra Y se verifica al servidor (sslmode=verify-full).
         sync: false
       - key: ADMIN_USERNAME
         sync: false

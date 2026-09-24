@@ -22,7 +22,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'sqlite'),
+    'default' => env('DB_CONNECTION', 'pgsql'),
 
     /*
     |--------------------------------------------------------------------------
@@ -101,7 +101,7 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
             'search_path' => 'public',
-            'sslmode' => $databaseCa ? 'verify-full' : env('DB_SSLMODE', 'prefer'),
+            'sslmode' => $databaseCa ? env('DB_SSLMODE', 'verify-full') : env('DB_SSLMODE', 'prefer'),
             'sslrootcert' => $databaseCa ? DatabaseSsl::materialize($databaseCa) : null,
         ],
 

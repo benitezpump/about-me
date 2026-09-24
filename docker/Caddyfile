@@ -1,0 +1,25 @@
+# Servidor web de la imagen (FrankenPHP = Caddy + PHP). Escucha en $PORT (Render lo define; por omisión 10000).
+{
+	# El HTTPS lo termina el proxy de Render (o el navegador habla http con localhost): Caddy no gestiona certificados.
+	auto_https off
+	# Sin API de administración de Caddy expuesta.
+	admin off
+	frankenphp
+	order php_server before file_server
+}
+
+:{$PORT:10000} {
+	root * /app/public
+	encode zstd gzip
+
+	# Los archivos de la aplicación que NUNCA deben servirse como estáticos.
+	@hidden path /.env* /.git* /storage/* /vendor/* /composer.* /artisan
+	respond @hidden 404
+
+	php_server
+
+	log {
+		output stdout
+		format console
+	}
+}

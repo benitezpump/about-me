@@ -99,8 +99,9 @@ else:
         fail("DATABASE_URL lleva la contraseña de la base: debe ser `sync: false` (se pide en el panel) o venir de "
              "fromDatabase; nunca un valor escrito en el archivo")
 
-    # Secretos: nunca en el archivo.
-    for secret in ("ADMIN_USERNAME", "ADMIN_PASSWORD"):
+    # Secretos: nunca en el archivo. APP_KEY cifra las cookies y sesiones: si estuviera aquí, cualquiera con acceso al
+    # repositorio podría falsificar la sesión del administrador.
+    for secret in ("APP_KEY", "ADMIN_USERNAME", "ADMIN_PASSWORD"):
         e = env.get(secret)
         if e is None:
             fail(f"falta {secret}")
@@ -118,10 +119,12 @@ else:
              "intentos de login. Usa un número de proxies (p. ej. \"1\")")
     if not trust:
         fail("falta TRUST_PROXY: detrás de Render todas las peticiones parecerían venir de la misma IP")
-    if str(env.get("COOKIE_SECURE", {}).get("value", "")).lower() != "true":
-        fail("COOKIE_SECURE debe ser \"true\" (Render sirve por HTTPS)")
-    if str(env.get("NODE_ENV", {}).get("value", "")) != "production":
-        fail("NODE_ENV debe ser production")
+    if str(env.get("SESSION_SECURE_COOKIE", {}).get("value", "")).lower() != "true":
+        fail("SESSION_SECURE_COOKIE debe ser \"true\" (Render sirve por HTTPS: cookies Secure y HSTS)")
+    if str(env.get("APP_ENV", {}).get("value", "")) != "production":
+        fail("APP_ENV debe ser production")
+    if str(env.get("APP_DEBUG", {}).get("value", "false")).lower() in ("true", "1", "yes", "on"):
+        fail("APP_DEBUG no debe ser true en producción: las páginas de error mostrarían variables de entorno y consultas")
 
 # La base gratuita de Render expira a los 30 días y luego se borra con sus datos, sin copias de seguridad.
 for name, db in databases.items():
