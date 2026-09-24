@@ -10,3 +10,6 @@ dist/
 # Contenido personal: no se sube. El repositorio trae db/seed/content.example.json (ficticio).
 db/seed/content.json
 legacy/
+
+# Contenido personal del dueño: no se sube (el repositorio trae solo content.example.json, ficticio).
+laravel/database/seed/content.json

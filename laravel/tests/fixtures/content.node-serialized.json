@@ -1,0 +1,288 @@
+{
+  "format": "about-me-content",
+  "version": 1,
+  "profile": {
+    "first_names": "Ana",
+    "last_names": "Prueba Ejemplo",
+    "display_name": "Ana Prueba",
+    "site_title": "Ana Prueba, desarrolladora de software (contenido de ejemplo)",
+    "headline": "Desarrolladora de software de ejemplo en Ciudad Ejemplo.",
+    "location": "Ciudad Ejemplo, México",
+    "intro": [
+      "Este es contenido de ejemplo. Entra a /admin, abre Importar y exportar y carga tu propio archivo JSON, o edita cada sección desde el panel.",
+      "Trabajo con Node.js, Vue.js y PostgreSQL, y también con PHP, Laravel y Go. Desde 2025 doy clases en un instituto de ejemplo.",
+      "Con \"comillas\", barras / y  invertidas, acentos áéíóú ñ y emoji 🙂."
+    ],
+    "cta_label": "Escríbeme por LinkedIn",
+    "cta_url": "https://www.linkedin.com/in/ejemplo",
+    "contact_prompt": "¿Tienes un sistema por construir? Escríbeme.",
+    "meta_description": "Ana Prueba Ejemplo, desarrolladora de software en Ciudad Ejemplo. Contenido de ejemplo del proyecto about-me.",
+    "og_description": "Sistemas de gestión y aplicaciones web. Contenido de ejemplo.",
+    "show_view_count": true
+  },
+  "contact_links": [],
+  "now_items": [
+    {
+      "since_label": "Desde 01/2020",
+      "title": "Desarrolladora de software",
+      "body": "en Acme Software. Hoy trabajo en Sistema Alfa.",
+      "visible": true
+    }
+  ],
+  "tool_groups": [
+    {
+      "label": "Principales",
+      "emphasis": true,
+      "tools": [
+        "Node.js",
+        "TypeScript",
+        "PostgreSQL",
+        "Docker",
+        "PHP",
+        "Laravel",
+        "Vue.js"
+      ]
+    },
+    {
+      "label": "En proyectos",
+      "emphasis": false,
+      "tools": [
+        "Go",
+        "Inertia.js",
+        "Express"
+      ]
+    }
+  ],
+  "technologies": [
+    "Zig",
+    "C#"
+  ],
+  "experiences": [
+    {
+      "kind": "work",
+      "company": "Acme Software",
+      "article": null,
+      "role": "Desarrolladora de software",
+      "location": "Ciudad Ejemplo",
+      "start_date": "2020-01-01",
+      "end_date": null,
+      "show_since": true,
+      "workshops_title": null,
+      "projects": [
+        {
+          "title": "Sistema Alfa",
+          "description": "Módulo de ejemplo para el control de pedidos, construido sobre Laravel con separación por dominios.",
+          "start_date": "2023-02-01",
+          "end_date": null,
+          "period_label": null,
+          "visible": true,
+          "technologies": [
+            {
+              "name": "PHP",
+              "note": null
+            },
+            {
+              "name": "Laravel",
+              "note": null
+            },
+            {
+              "name": "Inertia.js",
+              "note": null
+            },
+            {
+              "name": "PostgreSQL",
+              "note": "reportes"
+            }
+          ],
+          "highlights": [
+            {
+              "label": null,
+              "body": "Desarrollé desde cero el flujo de solicitudes: modelos, migraciones y vistas con filtros y paginación."
+            },
+            {
+              "label": "Reportes",
+              "body": "informes operativos con exportación a PDF."
+            }
+          ],
+          "legacy_stack": "Texto libre original."
+        },
+        {
+          "title": "Sistema Beta",
+          "description": "Aplicación de ejemplo para gestión de inventarios, con API en Node.js e interfaz en Vue.js.",
+          "stack": "Respaldo en texto libre.",
+          "start_date": "2021-03-01",
+          "end_date": "2022-11-01",
+          "period_label": null,
+          "visible": true,
+          "technologies": [
+            {
+              "name": "Node.js",
+              "note": null
+            },
+            {
+              "name": "Express",
+              "note": null
+            },
+            {
+              "name": "PostgreSQL",
+              "note": null
+            },
+            {
+              "name": "Vue.js",
+              "note": null
+            },
+            {
+              "name": "Docker",
+              "note": null
+            }
+          ],
+          "highlights": [
+            {
+              "label": "API",
+              "body": "diseño de la base de datos y de los servicios REST."
+            }
+          ]
+        },
+        {
+          "title": "Sistema Gamma",
+          "description": "Servicio de ejemplo para procesar eventos en segundo plano.",
+          "start_date": "2020-02-01",
+          "end_date": "2021-02-01",
+          "period_label": null,
+          "visible": true,
+          "technologies": [
+            {
+              "name": "Go",
+              "note": null
+            },
+            {
+              "name": "PostgreSQL",
+              "note": null
+            }
+          ],
+          "highlights": []
+        }
+      ]
+    },
+    {
+      "kind": "teaching",
+      "company": "Instituto Ejemplo",
+      "article": "el",
+      "role": "Profesora por asignatura",
+      "location": "Ciudad Ejemplo",
+      "start_date": "2025-01-01",
+      "end_date": null,
+      "show_since": false,
+      "workshops_title": "Talleres que impartí en el instituto",
+      "courses": [
+        {
+          "subject": "Redes de computadoras",
+          "start_date": "2025-08-01",
+          "end_date": null
+        },
+        {
+          "subject": "Bases de datos",
+          "start_date": "2025-01-01",
+          "end_date": "2025-05-01"
+        }
+      ],
+      "workshops": [
+        {
+          "name": "Introducción a Docker",
+          "period_label": "07 – 10 nov 2025",
+          "sort_date": "2025-11-07"
+        },
+        {
+          "name": "SQL para principiantes",
+          "period_label": "09 – 13 jun 2025",
+          "sort_date": "2025-06-09"
+        }
+      ]
+    }
+  ],
+  "personal_projects": [
+    {
+      "title": "Herramienta Delta",
+      "description": "Utilidad de línea de comandos de ejemplo escrita en Go.",
+      "start_date": "2022-05-01",
+      "end_date": null,
+      "period_label": null,
+      "visible": true,
+      "technologies": [
+        {
+          "name": "Go",
+          "note": null
+        },
+        {
+          "name": "Docker",
+          "note": "imagen mínima"
+        }
+      ],
+      "highlights": [
+        {
+          "label": null,
+          "body": "Publicada como imagen de contenedor de menos de 20 MB."
+        }
+      ]
+    },
+    {
+      "title": "Herramienta Épsilon",
+      "description": "Aplicación de escritorio de ejemplo.",
+      "start_date": "2019-01-01",
+      "end_date": "2019-06-01",
+      "period_label": null,
+      "visible": true,
+      "technologies": [
+        {
+          "name": "Vue.js",
+          "note": null
+        },
+        {
+          "name": "TypeScript",
+          "note": null
+        }
+      ],
+      "highlights": []
+    }
+  ],
+  "education": [
+    {
+      "title": "Ingeniería en Sistemas",
+      "institution": "Universidad Ejemplo",
+      "period_label": "2014 – 2018"
+    }
+  ],
+  "certification_groups": [
+    {
+      "title": "Cursos en línea",
+      "items": [
+        {
+          "name": "Curso de ejemplo de Node.js",
+          "issuer": "Plataforma Ejemplo",
+          "year": 2024,
+          "note": null,
+          "url": "https://example.com/certificados/nodejs"
+        },
+        {
+          "name": "Curso de ejemplo de PostgreSQL",
+          "issuer": "Plataforma Ejemplo",
+          "year": 2023,
+          "note": "Vigente hasta 2029.",
+          "url": "https://example.com/certificados/postgresql"
+        }
+      ]
+    },
+    {
+      "title": "Certificaciones profesionales",
+      "items": [
+        {
+          "name": "Certificación de ejemplo",
+          "issuer": null,
+          "year": 2022,
+          "note": null,
+          "url": null
+        }
+      ]
+    }
+  ]
+}
