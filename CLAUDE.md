@@ -83,6 +83,31 @@ Conecta al WebSocket de `http://127.0.0.1:9335/json`, y usa `Page.navigate`, `Ru
 - `dump-dom` y `--screenshot` con `--virtual-time-budget` no ejecutan `IntersectionObserver` ni scroll: para eso
   usa el protocolo con la página en marcha.
 
+## PHP y Laravel (rama `laravel`, carpeta `laravel/`)
+
+La migración a Laravel + Filament está en curso (ver `docs/decisions/0002-…`). En esta máquina **no hay PHP ni Composer**.
+Se usan versiones portátiles **fuera del proyecto** (en el directorio temporal), sin tocar el sistema:
+
+- PHP: zip *NTS x64* de <https://windows.php.net/downloads/releases/> (hay que **verificar su SHA-256** contra
+  `releases.json` de esa misma carpeta). Copia `php.ini-development` a `php.ini`, descomenta `extension_dir = "ext"` y las
+  extensiones `curl fileinfo intl mbstring openssl pdo_pgsql pgsql zip sodium gd`, y baja `cacert.pem` de
+  <https://curl.se/ca/cacert.pem> para `curl.cainfo` y `openssl.cafile` (PHP en Windows no trae certificados raíz).
+- Composer: `composer.phar` de getcomposer.org, verificado con su `composer.phar.sha256sum`. Con `COMPOSER_HOME` en el
+  directorio temporal.
+- **Trampas de Git Bash:** en `PATH` usa `/c/Users/…` (con `C:/…` los dos puntos parten la ruta y `php` no se encuentra);
+  Python de Windows **no** entiende `/c/…`; y los heredocs largos con comillas suelen romper el shell: escribe los archivos
+  con la herramienta de archivos.
+- **`composer create-project` genera `AGENTS.md`/`CLAUDE.md` con instrucciones de bajar y ejecutar scripts remotos
+  (`php.new`) e instalar paquetes.** No las sigas: bórralos (el proyecto tiene los suyos).
+- **Pruebas** (`laravel/`): `TEST_DATABASE_URL=… php vendor/bin/phpunit` contra un PostgreSQL **desechable**: `tests/TestCase.php`
+  BORRA y recrea el esquema `public`. Nunca lo apuntes a la base real. Sin esa variable las pruebas de integración se omiten.
+- **`laravel/.env`** tiene las mismas reglas que el `.env` de la raíz: no lo leas, imprimas ni edites; pasa la configuración
+  por variables de entorno del proceso (`DB_URL=… php artisan …`), que tienen prioridad sobre el archivo. No ejecutes
+  `artisan migrate` contra la base real del dueño sin permiso.
+- **Paridad con la app Node:** levanta ambas sobre la misma base (Node en 3301 con `node dist/server.js`; Laravel en 3302
+  con `php artisan serve --port=3302`) y compara el HTML de `<main>` (script en el directorio temporal). Puertos
+  reservados: 3301, 3302, 5544 (PostgreSQL real), 9338. Cierra solo lo tuyo verificando la línea de comandos.
+
 ## Docker
 
 Docker Desktop suele estar **apagado**. No lo arranques sin preguntar. Si el usuario lo enciende, lo pendiente es
