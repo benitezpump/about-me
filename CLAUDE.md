@@ -14,6 +14,12 @@ máquina (Windows 11, Git Bash y PowerShell).
 - Antes de editar un archivo que ya creaste en la sesión, recuerda que el usuario también lo edita en su IDE:
   relee lo que cambió en disco en lugar de asumir.
 
+## Commits
+
+- **No añadas `Co-Authored-By` ni otra línea de atribución a los commits** (petición expresa del dueño). Mensaje limpio.
+- Fírmalos con el correo `noreply` de GitHub del dueño, **nunca con su Gmail** (el correo del autor es público en GitHub).
+  Si la configuración local de git tiene el Gmail, pasa `-c user.email=<noreply>` al confirmar; no la cambies.
+
 ## Ejecutar la app sin tocar la base del dueño
 
 `npm run dev` carga `.env`, que puede apuntar a la base real. Para probar con navegador usa el servidor compilado
