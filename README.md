@@ -216,6 +216,10 @@ TEST_DATABASE_URL=postgres://usuario:clave@localhost:5432/una_base_desechable ve
   tu máquina y se omite donde esos archivos faltan.
 - `.github/workflows/ci.yml` corre las pruebas contra PostgreSQL 17, `composer audit`, valida `render.yaml` y construye la
   imagen con `docker compose` y le pasa `scripts/smoke.sh`. **Nunca se ha ejecutado en GitHub.**
+- **Publicación de la imagen (opcional).** El trabajo `publish` sube la imagen a Docker Hub (`<usuario>/about-me`, etiquetas
+  `latest` y el commit corto) solo en un `push` a `master` y solo si `phpunit` y `docker` pasaron. Necesita dos secretos del
+  repositorio (Settings → Secrets and variables → Actions): `DOCKERHUB_USERNAME` y `DOCKERHUB_TOKEN` (token de acceso con
+  permiso Read & Write, no tu contraseña). Sin ellos solo falla ese trabajo. Tampoco se ha ejecutado nunca.
 - Dependabot (`.github/dependabot.yml`) propone actualizaciones semanales; los cambios de versión **mayor** de Laravel, Filament
   y PHPUnit están excluidos a propósito y se deciden a mano. Nunca propone una versión mayor de PostgreSQL (exige exportar e
   importar los datos).
