@@ -1,8 +1,8 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "benitezpump/about-me",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "Sitio personal con contenido en PostgreSQL y panel de administración (Laravel + Filament).",
     "keywords": ["laravel", "framework"],
     "license": "MIT",
     "require": {

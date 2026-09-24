@@ -19,6 +19,16 @@
     </source>
     <php>
         <env name="APP_ENV" value="testing"/>
+        <!-- Clave solo para pruebas y variables sensibles vacías: las pruebas NO dependen del .env de quien las corre
+             (que puede traer la DATABASE_URL real, la contraseña del administrador o la CA de producción). -->
+        <env name="APP_KEY" value="base64:MWEHHhd1CxmFiITI4qCnWpVLQ0zupBjYPOOtd+gK8tY="/>
+        <env name="DATABASE_URL" value=""/>
+        <env name="DB_URL" value=""/>
+        <env name="DATABASE_SSL_CA" value=""/>
+        <env name="ADMIN_USERNAME" value=""/>
+        <env name="ADMIN_PASSWORD" value=""/>
+        <env name="SEED_ON_EMPTY" value="false"/>
+        <env name="SESSION_SECURE_COOKIE" value="false"/>
         <env name="APP_LOCALE" value="es"/>
         <env name="APP_FALLBACK_LOCALE" value="es"/>
         <env name="TRUST_PROXY" value=""/>
