@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Concerns\ForgetsSiteContent;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Certificado, con enlace opcional para verificarlo.
@@ -19,4 +20,9 @@ class Certification extends Model
     protected $guarded = [];
 
     protected $table = 'certifications';
+
+    public function group(): BelongsTo
+    {
+        return $this->belongsTo(CertificationGroup::class, 'group_id');
+    }
 }

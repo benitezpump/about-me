@@ -35,7 +35,7 @@ class SchemaTest extends TestCase
         Artisan::call('migrate', ['--force' => true]);
 
         $this->assertSame($antes, DB::table('schema_migrations')->pluck('applied_at', 'name')->all());
-        $this->assertSame(1, DB::table('migrations')->count());
+        $this->assertSame(count(glob(database_path('migrations/*.php'))), DB::table('migrations')->count());
     }
 
     public function test_toda_tabla_de_public_tiene_row_level_security(): void

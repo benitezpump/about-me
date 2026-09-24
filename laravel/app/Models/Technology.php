@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Concerns\ForgetsSiteContent;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Catálogo de tecnologías: un nombre único (sin distinguir mayúsculas). Se elige de aquí, no se escribe.
@@ -19,4 +20,14 @@ class Technology extends Model
     protected $guarded = [];
 
     protected $table = 'technologies';
+
+    public function projectLinks(): HasMany
+    {
+        return $this->hasMany(ProjectTechnology::class);
+    }
+
+    public function toolItems(): HasMany
+    {
+        return $this->hasMany(ToolGroupItem::class);
+    }
 }

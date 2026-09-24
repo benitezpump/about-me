@@ -18,6 +18,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // TRUST_PROXY (número de saltos, lista de IP/CIDR o ninguno) en lugar del TrustProxies de Laravel.
         $middleware->replace(TrustProxies::class, ApplyTrustedProxies::class);
         $middleware->append(SecurityHeaders::class);
+        // `notrack` es un "1" sin datos personales: se envía en claro para poder leerlo en las rutas públicas sin descifrar.
+        $middleware->encryptCookies(except: ['notrack']);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

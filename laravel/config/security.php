@@ -19,4 +19,18 @@ return [
     */
     'content_cache_ttl' => (int) env('CONTENT_CACHE_TTL', 60),
 
+    /*
+    | Administrador inicial (`php artisan admin:ensure`). Se leen aquí, no con env() en los comandos: con `config:cache`
+    | (producción) env() fuera de los archivos de configuración devuelve null.
+    */
+    'admin' => [
+        'username' => env('ADMIN_USERNAME'),
+        'password' => env('ADMIN_PASSWORD'),
+    ],
+
+    /*
+    | Contenido inicial: se carga con `php artisan content:seed` si la base está vacía y SEED_ON_EMPTY es true.
+    */
+    'seed_on_empty' => filter_var(env('SEED_ON_EMPTY', false), FILTER_VALIDATE_BOOLEAN),
+
 ];

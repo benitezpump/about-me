@@ -49,6 +49,19 @@ final class Format
         return implode('', array_map(fn (string $w) => mb_strtoupper(mb_substr($w, 0, 1)), $words));
     }
 
+    /**
+     * Divide un texto por líneas en blanco en párrafos; recorta y descarta los vacíos.
+     *
+     * @return list<string>
+     */
+    public static function paragraphs(string $text): array
+    {
+        return array_values(array_filter(
+            array_map('trim', preg_split('/\R\s*\R/u', $text) ?: []),
+            fn (string $p) => $p !== '',
+        ));
+    }
+
     /** Solo los enlaces http(s) se abren en pestaña nueva; mailto: y tel: no. */
     public static function isHttp(?string $url): bool
     {

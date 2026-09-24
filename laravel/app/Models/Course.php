@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Concerns\ForgetsSiteContent;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Materia impartida, por periodo.
@@ -19,4 +20,9 @@ class Course extends Model
     protected $guarded = [];
 
     protected $table = 'courses';
+
+    public function experience(): BelongsTo
+    {
+        return $this->belongsTo(Experience::class);
+    }
 }

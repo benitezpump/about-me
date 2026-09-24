@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\CoalescesNulls;
 use App\Models\Concerns\ForgetsSiteContent;
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class NowItem extends Model
 {
-    use ForgetsSiteContent;
+    use ForgetsSiteContent, CoalescesNulls;
 
     public $timestamps = false;
 
@@ -20,8 +21,13 @@ class NowItem extends Model
 
     protected $table = 'now_items';
 
+    /** Columnas `not null default ''`: Filament guarda un texto vacío como NULL. */
+    protected array $emptyStrings = ['body'];
+
     protected function casts(): array
     {
-        return ['visible' => 'boolean'];
+        return [
+            'visible' => 'boolean',
+        ];
     }
 }

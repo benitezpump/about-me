@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\CoalescesNulls;
 use App\Models\Concerns\ForgetsSiteContent;
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,11 +13,14 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Education extends Model
 {
-    use ForgetsSiteContent;
+    use ForgetsSiteContent, CoalescesNulls;
 
     public $timestamps = false;
 
     protected $guarded = [];
 
     protected $table = 'education';
+
+    /** Columnas `not null default ''`: Filament guarda un texto vacío como NULL. */
+    protected array $emptyStrings = ['institution'];
 }

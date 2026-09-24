@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Concerns\ForgetsSiteContent;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Taller o curso impartido.
@@ -19,4 +20,9 @@ class Workshop extends Model
     protected $guarded = [];
 
     protected $table = 'workshops';
+
+    public function experience(): BelongsTo
+    {
+        return $this->belongsTo(Experience::class);
+    }
 }

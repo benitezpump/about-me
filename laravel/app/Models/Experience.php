@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\CoalescesNulls;
 use App\Models\Concerns\ForgetsSiteContent;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -13,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Experience extends Model
 {
-    use ForgetsSiteContent;
+    use ForgetsSiteContent, CoalescesNulls;
 
     public $timestamps = false;
 
@@ -21,17 +22,28 @@ class Experience extends Model
 
     protected $table = 'experiences';
 
+    /** Columnas `not null default ''`: Filament guarda un texto vacío como NULL. */
+    protected array $emptyStrings = ['location'];
+
     protected function casts(): array
     {
-        return ['show_since' => 'boolean'];
+        return [
+            'show_since' => 'boolean',
+        ];
     }
 
-    /** Proyectos visibles, del más reciente al más antiguo. */
+    /** Proyectos visibles, del más reciente al más antiguo (lo que muestra el sitio). */
     public function projects(): HasMany
     {
         return $this->hasMany(Project::class)
             ->where('visible', true)
             ->orderByDesc('start_date')->orderBy('position')->orderBy('id');
+    }
+
+    /** Todos los proyectos, visibles o no (para saber si la experiencia está en uso). */
+    public function allProjects(): HasMany
+    {
+        return $this->hasMany(Project::class);
     }
 
     public function courses(): HasMany
