@@ -1,12 +1,36 @@
-node_modules/
-dist/
+*.log
+.DS_Store
 .env
 .env.*
 !.env.example
-.pglite/
-*.log
-.DS_Store
+.phpactor.json
+.phpunit.result.cache
+/.codex
+/.cursor/
+/.idea
+/.nova
+/.phpunit.cache
+/.vscode
+/.zed
+/auth.json
+/node_modules
+/public/build
+/public/css/filament
+/public/fonts-manifest.dev.json
+/public/fonts/filament
+/public/hot
+/public/js/filament
+/public/storage
+/storage/*.key
+/storage/pail
+/vendor
+_ide_helper.php
+Homestead.json
+Homestead.yaml
+Thumbs.db
 
-# Contenido personal: no se sube. El repositorio trae db/seed/content.example.json (ficticio).
-db/seed/content.json
-legacy/
+# Contenido personal del dueño: NO se sube. El repositorio trae solo database/seed/content.example.json (ficticio).
+# `db/` es el directorio de la app anterior (Node): puede quedar en tu disco con tu content.json de entonces.
+/database/seed/content.json
+/db/
+/legacy/

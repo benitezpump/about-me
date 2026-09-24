@@ -1,6 +1,6 @@
 # 0001. Arquitectura y alcance del panel
 
-- **Estado:** aceptada
+- **Estado:** aceptada. **La parte de arquitectura (conservar Fastify + Nunjucks) la reemplaza el [0002](0002-migracion-a-laravel-filament.md)**; el **alcance congelado del panel y sus señales de crecimiento siguen vigentes** (ahora las vigila `tests/Unit/ScopeTest.php`).
 - **Fecha:** 2026-09-24
 - **Decide:** Carlos Benítez, a partir de una evaluación de arquitectura hecha ese mismo día.
 

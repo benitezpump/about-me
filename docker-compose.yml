@@ -1,6 +1,6 @@
 services:
   # Base de datos local. Solo arranca con COMPOSE_PROFILES=local-db (ver .env.example).
-  # Si ya tienes tu propia base PostgreSQL, no actives ese perfil y define DATABASE_URL en .env.
+  # Si ya tienes tu propia base PostgreSQL (Supabase, etc.), no actives ese perfil y define DATABASE_URL en .env.
   db:
     profiles: ["local-db"]
     image: postgres:17-alpine
@@ -26,18 +26,22 @@ services:
         condition: service_healthy
         required: false   # sin el perfil local-db, la app usa la base externa
     environment:
-      NODE_ENV: production
+      APP_ENV: production
+      APP_DEBUG: "false"
+      APP_KEY: "${APP_KEY:?Define APP_KEY en .env (genérala con php artisan key:generate --show)}"
       # Tu DATABASE_URL del .env tiene prioridad; si no existe, usa la base local del perfil local-db.
       DATABASE_URL: ${DATABASE_URL:-postgres://about_me:${POSTGRES_PASSWORD:-}@db:5432/about_me}
-      DB_POOL_MAX: ${DB_POOL_MAX:-10}
+      DATABASE_SSL_CA: ${DATABASE_SSL_CA:-}
       RUN_MIGRATIONS: ${RUN_MIGRATIONS:-true}
       SEED_ON_EMPTY: "true"
-      ADMIN_USERNAME: ${ADMIN_USERNAME:?Define ADMIN_USERNAME en .env}
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Define ADMIN_PASSWORD en .env}
-      COOKIE_SECURE: ${COOKIE_SECURE:-false}
-      TRUST_PROXY: ${TRUST_PROXY:-false}
+      ADMIN_USERNAME: "${ADMIN_USERNAME:?Define ADMIN_USERNAME en .env}"
+      ADMIN_PASSWORD: "${ADMIN_PASSWORD:?Define ADMIN_PASSWORD en .env}"
+      # false en local (http://localhost); true detrás de HTTPS.
+      SESSION_SECURE_COOKIE: ${SESSION_SECURE_COOKIE:-false}
+      TRUST_PROXY: ${TRUST_PROXY:-}
     ports:
-      - "${APP_PORT:-3000}:3000"
+      # Solo tu equipo: sin la dirección 127.0.0.1 Docker publicaría el puerto en TODAS las interfaces de tu red.
+      - "127.0.0.1:${APP_PORT:-8080}:10000"
 
 volumes:
   pgdata:

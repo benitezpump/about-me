@@ -1,16 +1,35 @@
-node_modules
-dist
+# Lo que NO entra a la imagen (ni a su contexto de construcción).
 .git
-.gitignore
+.github
 .env
 .env.*
 !.env.example
-.pglite
-legacy
+
+# Dependencias y artefactos: la imagen instala los suyos.
+vendor
+node_modules
+public/hot
+public/storage
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/framework/db-ca-*.pem
+bootstrap/cache/*.php
+
+# Pruebas, documentación y herramientas de desarrollo.
 tests
-scripts
-.github
 docs
-render.yaml
+scripts
+phpunit.xml
+.phpunit.cache
+.editorconfig
+.gitattributes
 *.md
-*.log
+docker-compose.yml
+render.yaml
+
+# Contenido personal del dueño: jamás debe acabar dentro de una imagen que se publique.
+legacy
+db
+database/seed/content.json

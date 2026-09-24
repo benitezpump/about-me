@@ -1,11 +1,14 @@
 name: CI
 
 # Qué verifica, y por qué está aquí y no solo en tu equipo:
-#  - Pruebas contra un PostgreSQL REAL (17): en local se usa PGlite, que se comporta distinto en detalles como los
-#    códigos de error. Ya hubo un caso (on delete restrict: 23503 en PostgreSQL, 23001 en PGlite).
-#  - Node 22 (el de producción, ver .nvmrc), no el que tenga instalado cada quien.
+#  - Pruebas contra un PostgreSQL REAL (17). El esquema usa restricciones NOT VALID, llaves compuestas y RLS que SQLite no
+#    entiende; por eso las pruebas nunca corren contra SQLite.
+#  - PHP 8.4 (el de producción, ver Dockerfile), no el que tenga instalado cada quien.
 #  - La imagen de Docker y el docker-compose de punta a punta: arrancan, migran, siembran y sirven por HTTP.
 #  - El Blueprint de Render (render.yaml) contra el esquema oficial de Render.
+#
+# ¡Este flujo nunca se ha ejecutado en GitHub! Su primera ejecución lo valida; el trabajo `docker` es lo único que ejercita la
+# imagen (Docker estaba apagado cuando se escribió).
 
 on:
   push:
@@ -21,7 +24,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  postgres:
+  phpunit:
     name: Pruebas contra PostgreSQL real
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -39,31 +42,23 @@ jobs:
           --health-retries 10
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-node@v4
+      - uses: shivammathur/setup-php@v2
         with:
-          node-version-file: .nvmrc
-          cache: npm
-      - run: npm ci
-      - run: npm run typecheck
-      - name: Pruebas (cada archivo crea y borra su propia base)
-        run: npm test
+          php-version: "8.4"
+          extensions: intl, pdo_pgsql, zip, mbstring
+          tools: composer:v2
+          coverage: none
+      - name: Caché de Composer
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/composer
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-
+      - run: composer install --no-interaction --no-progress --prefer-dist
+      - name: Pruebas (borran y recrean el esquema `public` de la base desechable del servicio)
+        run: vendor/bin/phpunit
         env:
           TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
-
-  pglite:
-    name: Pruebas con PGlite y compilación
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-          cache: npm
-      - run: npm ci
-      - run: npm run typecheck
-      - run: npm test # el modo que se usa en local: que no se desvíe del de PostgreSQL
-      - run: npm run build
 
   audit:
     name: Vulnerabilidades conocidas
@@ -71,13 +66,14 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-node@v4
+      - uses: shivammathur/setup-php@v2
         with:
-          node-version-file: .nvmrc
-          cache: npm
-      - run: npm ci
-      # Solo lo que va a producción, y solo lo grave: un aviso menor en una herramienta de desarrollo no debe bloquear.
-      - run: npm audit --omit=dev --audit-level=high
+          php-version: "8.4"
+          extensions: intl, zip
+          tools: composer:v2
+          coverage: none
+      # Usa composer.lock: revisa exactamente lo que se instala en producción.
+      - run: composer audit --locked
 
   render:
     name: Blueprint de Render (render.yaml)
@@ -86,32 +82,32 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       # Descarga el esquema oficial de Render y comprueba además reglas propias (sin secretos en el archivo, base de
-      # pago, TRUST_PROXY sin `true`…). Si Render endurece su esquema, esto avisa antes de que falle un despliegue.
+      # pago, TRUST_PROXY sin `true`, APP_DEBUG apagado…). Si Render endurece su esquema, esto avisa antes de que falle un
+      # despliegue.
       - run: pip install --quiet pyyaml jsonschema
       - run: python scripts/validate-render.py render.yaml
 
   docker:
     name: Imagen Docker y compose
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     env:
       COMPOSE_PROFILES: local-db
       POSTGRES_PASSWORD: ci_postgres_password_123
       ADMIN_USERNAME: ci-admin
       ADMIN_PASSWORD: ci-admin-password-123
-      APP_PORT: "3000"
+      APP_PORT: "8080"
     steps:
       - uses: actions/checkout@v7
+      - name: Clave de aplicación de la prueba (desechable)
+        run: echo "APP_KEY=base64:$(openssl rand -base64 32)" >> "$GITHUB_ENV"
       - name: Levantar con docker compose (construye la imagen y espera a que estén sanos)
-        run: docker compose up -d --build --wait --wait-timeout 180
-      - name: Comprobaciones de humo (incluye un inicio de sesión real)
-        run: bash scripts/smoke.sh http://127.0.0.1:3000
-        env:
-          SMOKE_ADMIN_USER: ci-admin
-          SMOKE_ADMIN_PASSWORD: ci-admin-password-123
+        run: docker compose up -d --build --wait --wait-timeout 300
+      - name: Comprobaciones de humo
+        run: bash scripts/smoke.sh http://127.0.0.1:8080
       - name: Registros de los contenedores (solo si algo falló)
         if: failure()
-        run: docker compose logs --no-color --tail 200
+        run: docker compose logs --no-color --tail 300
       - name: Apagar y borrar volúmenes
         if: always()
         run: docker compose down -v

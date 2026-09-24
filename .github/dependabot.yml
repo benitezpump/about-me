@@ -1,9 +1,9 @@
 # Actualizaciones automáticas: llegan como solicitudes de cambio que la integración continua (ci.yml) prueba solas.
-# Las reglas `ignore` no son descuido, son decisiones (ver docs/decisions/0001-arquitectura-y-alcance-del-panel.md).
+# Las reglas `ignore` no son descuido, son decisiones (ver docs/decisions/0002-migracion-a-laravel-filament.md).
 version: 2
 
 updates:
-  - package-ecosystem: npm
+  - package-ecosystem: composer
     directory: /
     schedule:
       interval: weekly
@@ -13,14 +13,15 @@ updates:
     open-pull-requests-limit: 5
     groups:
       # Los parches y menores se agrupan en una sola solicitud para no recibir una por paquete.
-      npm-menores-y-parches:
+      composer-menores-y-parches:
         update-types: [minor, patch]
     ignore:
-      # TypeScript se queda en 5.9 a propósito: 7.x es un cambio mayor recién publicado. Se revisa a mano.
-      - dependency-name: typescript
+      # Un salto de versión mayor del framework, del panel o de las pruebas se decide y se prueba a mano.
+      - dependency-name: laravel/framework
         update-types: ["version-update:semver-major"]
-      # Los tipos deben coincidir con el Node de producción (22), no con el último.
-      - dependency-name: "@types/node"
+      - dependency-name: filament/filament
+        update-types: ["version-update:semver-major"]
+      - dependency-name: phpunit/phpunit
         update-types: ["version-update:semver-major"]
 
   - package-ecosystem: github-actions
@@ -36,10 +37,8 @@ updates:
       interval: weekly
       day: monday
       timezone: America/Hermosillo
-    ignore:
-      # Producción va en la línea LTS de Node 22; un salto de versión se decide, no llega solo.
-      - dependency-name: node
-        update-types: ["version-update:semver-major"]
+    # Ojo: la etiqueta de la imagen base incluye la versión de PHP (`1-php8.4-alpine`); una propuesta que cambie el PHP menor
+    # (8.5…) es una decisión, no un parche: revísala y prueba antes de aceptarla.
 
   - package-ecosystem: docker-compose
     directory: /
