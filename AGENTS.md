@@ -158,5 +158,8 @@ GET /  →  SiteController  →  SiteContent::get() (consultas con Eloquent → 
 - **Con `verify-full`** el certificado del pooler de Supabase debe coincidir con su nombre: no se pudo comprobar. Si falla solo
   por eso, `DB_SSLMODE=verify-ca`.
 - **`TRUST_PROXY` en Render** hay que verificarlo en el primer despliegue (README).
+- **Primer despliegue en Render falló** con `frankenphp: Operation not permitted` (estado 126): el binario de la imagen base lleva la
+  capacidad `cap_net_bind_service=+ep` y Render no la concede. El `Dockerfile` la quita copiando el binario y `docker-compose.yml`
+  arranca con `cap_drop: ALL` para que la integración continua lo detecte. **Ninguna de las dos cosas se ha ejecutado aún.**
 - **FrankenPHP** se eligió sobre nginx + php-fpm por tener un solo proceso; sus etiquetas de imagen y el `Caddyfile` no se han
   probado.
