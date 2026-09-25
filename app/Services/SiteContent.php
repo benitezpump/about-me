@@ -183,7 +183,8 @@ class SiteContent
             'id' => $p->id,
             'title' => $p->title,
             'description' => $p->description,
-            'stack' => Format::stackLine($techs, $p->stack),
+            'stackItems' => Format::stackItems($techs),
+            'stackLegacy' => $techs === [] ? $p->stack : '',
             'period' => Format::period($p->start_date, $p->end_date, $p->period_label),
             'highlights' => $p->highlights->map(fn ($h) => (object) ['label' => $h->label, 'body' => $h->body])->all(),
         ];

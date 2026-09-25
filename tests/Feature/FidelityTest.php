@@ -54,7 +54,7 @@ class FidelityTest extends TestCase
 
         // Las líneas de tecnologías ya no son texto libre sino que salen del catálogo (y pierden algo de prosa, p. ej.
         // "en backend"): se verifican con las pruebas del catálogo. Todo lo demás debe ser idéntico.
-        $stripStack = fn (string $html): string => preg_replace('#<p class="stack">[\s\S]*?</p>#', '', $html) ?? $html;
+        $stripStack = fn (string $html): string => preg_replace('#<(p|ul) class="stack[^"]*"[^>]*>[\s\S]*?</\1>#', '', $html) ?? $html;
         $expected = self::textOf($stripStack(self::mainOf((string) file_get_contents($this->legacy()))));
         $actual = self::textOf($stripStack(self::mainOf($actualHtml)));
 

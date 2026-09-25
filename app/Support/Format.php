@@ -77,20 +77,17 @@ final class Format
     }
 
     /**
-     * Línea de tecnologías de un proyecto, desde el catálogo: "PHP, Laravel, Browsershot (generación de PDF).".
-     * Solo si el proyecto aún no tiene tecnologías se muestra su texto libre heredado.
+     * Tecnologías de un proyecto, desde el catálogo, una por etiqueta: ["PHP", "Browsershot (generación de PDF)"].
+     * El texto libre heredado (`projects.stack`) solo se muestra si el proyecto no tiene tecnologías (`SiteContent`).
      *
      * @param  list<array{name: string, note: ?string}>  $techs
+     * @return list<string>
      */
-    public static function stackLine(array $techs, string $legacyText): string
+    public static function stackItems(array $techs): array
     {
-        if ($techs === []) {
-            return $legacyText;
-        }
-
-        return implode(', ', array_map(
+        return array_map(
             fn (array $t) => ($t['note'] ?? '') !== '' ? "{$t['name']} ({$t['note']})" : $t['name'],
             $techs,
-        )).'.';
+        );
     }
 }

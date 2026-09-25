@@ -2,7 +2,7 @@
   var root = document.documentElement;
   var btn = document.querySelector('.theme');
   var meta = document.querySelector('meta[name="theme-color"]');
-  var colors = { dark: '#0e1320', light: '#f6f7fa' };
+  var colors = { dark: '#09090b', light: '#fafafa' };
 
   function apply(theme) {
     root.setAttribute('data-theme', theme);

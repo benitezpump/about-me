@@ -161,13 +161,13 @@ class AdminContentTest extends TestCase
     {
         Fixture::insert();
         $php = Technology::where('name', 'PHP')->firstOrFail();
-        $this->assertStringContainsString('<p class="stack">PHP, Laravel (reportes).</p>', $this->home());
+        $this->assertStringContainsString('<ul class="stack chips" aria-label="Tecnologías"><li>PHP</li><li>Laravel (reportes)</li></ul>', $this->home());
 
         Livewire::test(EditTechnology::class, ['record' => $php->id])
             ->fillForm(['name' => 'PHP 8'])->call('save')->assertHasNoFormErrors();
 
         $html = $this->home();
-        $this->assertStringContainsString('<p class="stack">PHP 8, Laravel (reportes).</p>', $html, 'en el proyecto');
+        $this->assertStringContainsString('<ul class="stack chips" aria-label="Tecnologías"><li>PHP 8</li><li>Laravel (reportes)</li></ul>', $html, 'en el proyecto');
         $this->assertStringContainsString('<dd>Node.js, PHP 8.</dd>', $html, 'y en Herramientas');
     }
 
@@ -317,7 +317,7 @@ class AdminContentTest extends TestCase
 
         $html = $this->home();
         $this->assertLessThan(strpos($html, 'Proyecto reciente'), strpos($html, 'Proyecto de 2030'), '2030 es la fecha más reciente');
-        $this->assertStringContainsString('<p class="stack">Node.js (API), PHP.</p>', $html);
+        $this->assertStringContainsString('<ul class="stack chips" aria-label="Tecnologías"><li>Node.js (API)</li><li>PHP</li></ul>', $html);
         $this->assertStringContainsString('<li><strong>Etiqueta:</strong> Primer punto</li>', $html);
         $this->assertStringContainsString('<li>Segundo punto</li>', $html);
     }
@@ -368,7 +368,7 @@ class AdminContentTest extends TestCase
             ->assertHasNoFormErrors();
 
         $html = $this->home();
-        $this->assertStringContainsString('<p class="stack">Node.js, Laravel (nota).</p>', $html);
+        $this->assertStringContainsString('<ul class="stack chips" aria-label="Tecnologías"><li>Node.js</li><li>Laravel (nota)</li></ul>', $html);
         $this->assertStringContainsString('<li>Único punto</li>', $html);
         $this->assertStringNotContainsString('informes en PDF.', $html);
     }

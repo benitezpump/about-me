@@ -59,7 +59,7 @@ class HomeTest extends TestCase
         Fixture::insert();
         $html = $this->home();
 
-        $this->assertStringContainsString('<p class="stack">PHP, Laravel (reportes).</p>', $html);
+        $this->assertStringContainsString('<ul class="stack chips" aria-label="Tecnologías"><li>PHP</li><li>Laravel (reportes)</li></ul>', $html);
         $this->assertStringContainsString('<p class="stack">Texto libre heredado.</p>', $html);
         $this->assertStringContainsString('<dd>Node.js, PHP.</dd>', $html, 'las herramientas respetan su orden');
     }
