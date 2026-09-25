@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 class SchemaTest extends TestCase
@@ -24,6 +25,20 @@ class SchemaTest extends TestCase
         Artisan::call('migrate', ['--force' => true]);
         $this->assertStringContainsString('Nothing to migrate', Artisan::output());
         $this->assertSame(7, DB::table('schema_migrations')->count());
+    }
+
+    public function test_un_archivo_sql_nuevo_llega_a_una_base_que_ya_habia_migrado(): void
+    {
+        // Estado de la base desplegada antes del 007: Laravel ya registró `apply_sql_schema` y no la vuelve a correr, así que
+        // el archivo nuevo solo llega si `migrate` lo aplica por su cuenta (falló en producción: la columna no existía).
+        DB::unprepared('alter table education drop column professional_license');
+        DB::table('schema_migrations')->where('name', '007_education_professional_license.sql')->delete();
+
+        Artisan::call('migrate', ['--force' => true]);
+
+        $this->assertStringContainsString('Nothing to migrate', Artisan::output());
+        $this->assertTrue(Schema::hasColumn('education', 'professional_license'));
+        $this->assertSame(count(glob(database_path('sql/*.sql'))), DB::table('schema_migrations')->count());
     }
 
     public function test_una_base_ya_migrada_por_la_app_anterior_no_se_vuelve_a_tocar(): void

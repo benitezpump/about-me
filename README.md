@@ -102,7 +102,8 @@ scripts/               smoke.sh (comprobaciones HTTP) y validate-render.py (vali
 El esquema es SQL plano en `database/sql/` (no el constructor de esquemas de Laravel): usa restricciones `NOT VALID`,
 llaves foráneas compuestas, RLS y comentarios que ese constructor no expresa. La migración de Laravel
 (`2026_09_24_000000_apply_sql_schema`) aplica los archivos que falten y los anota en `schema_migrations`, **la misma tabla
-que usaba la aplicación anterior**: sobre una base que ya estaba migrada no repite nada.
+que usaba la aplicación anterior**: sobre una base que ya estaba migrada no repite nada. Laravel corre esa migración una sola
+vez, así que los archivos SQL posteriores los aplica `App\Support\SqlSchema` al final de cada `php artisan migrate`.
 
 Tablas de contenido (todas con `position` para ordenar y restricciones que repiten las reglas de los formularios):
 `profile` (una fila), `now_items`, `technologies` (catálogo), `tool_groups` + `tool_group_items`, `experiences`, `projects`
@@ -133,7 +134,7 @@ Todo se hace desde `/admin` y se publica al guardar:
 ### Una entidad nueva
 
 1. Crea el siguiente archivo `database/sql/00N_….sql` con la tabla y **activa RLS en ella** (la migración de Laravel
-   `apply_sql_schema` recoge los archivos nuevos sola).
+   `migrate` recoge los archivos nuevos solo: `App\Support\SqlSchema` corre al final de cada `php artisan migrate`).
 2. Crea su modelo (`app/Models`, con `ForgetsSiteContent`) y su recurso de Filament (`app/Filament/Resources`).
 3. Léela en `app/Services/SiteContent.php` y muéstrala en `resources/views/home.blade.php`.
 4. Inclúyela en el formato JSON: `ContentParser`, `ContentExporter` e `ContentImporter` (y su lista `TABLES`). Sin esto una

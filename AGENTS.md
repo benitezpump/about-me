@@ -51,7 +51,8 @@ navegador real (ver `CLAUDE.md`): las pruebas HTTP y de Livewire no cubren el Ja
   `unsafe-inline`/`unsafe-eval` (Livewire y Alpine): es una concesión acotada a `/admin` y `/livewire` (`SecurityHeaders`).
 - **Esquema: nunca edites un archivo de `database/sql/` ya aplicado; añade el siguiente** (`007_….sql`). No uses el constructor
   de esquemas de Laravel para las tablas de contenido: no expresa restricciones `NOT VALID`, llaves compuestas ni RLS. Las
-  migraciones de Laravel (`database/migrations/`) solo aplican ese SQL y crean tablas propias del framework (`web_sessions`).
+  migraciones de Laravel (`database/migrations/`) solo aplican ese SQL (`App\Support\SqlSchema`, que también corre al final de
+  cada `migrate`: Laravel ejecuta `apply_sql_schema` una sola vez y sin eso un `007` nunca llegaría a una base ya desplegada) y crean tablas propias del framework (`web_sessions`).
 - **Restricciones nuevas sobre tablas con datos: `NOT VALID` y luego validar sin fallar** (ver el bloque final de
   `004_integrity_and_indexes.sql`). Una migración que falla tumba el sitio al arrancar, y la base del dueño puede tener datos
   que tus pruebas no imaginan. Añade una prueba de actualización como la de `SchemaTest`.
