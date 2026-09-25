@@ -35,7 +35,11 @@ final class ContentSerializer
                     : ['courses' => $e['courses'], 'workshops' => $e['workshops']]),
             ], $data['experiences']),
             'personal_projects' => array_map($project, $data['personal_projects']),
-            'education' => $data['education'],
+            // La cédula solo sale si existe: un archivo sin ella queda igual que antes de que el campo existiera.
+            'education' => array_map(static fn (array $e): array => [
+                'title' => $e['title'], 'institution' => $e['institution'], 'period_label' => $e['period_label'],
+                ...(($e['professional_license'] ?? null) !== null ? ['professional_license' => $e['professional_license']] : []),
+            ], $data['education']),
             'certification_groups' => $data['certification_groups'],
         ];
 

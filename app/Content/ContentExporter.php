@@ -92,6 +92,7 @@ final class ContentExporter
             'personal_projects' => $projects->where('kind', 'personal')->map($toProject)->values()->all(),
             'education' => $ordered('education')->map(fn ($e) => [
                 'title' => $e->title, 'institution' => $e->institution, 'period_label' => $e->period_label,
+                'professional_license' => $e->professional_license,
             ])->values()->all(),
             'certification_groups' => $ordered('certification_groups')->map(fn ($g) => [
                 'title' => $g->title,

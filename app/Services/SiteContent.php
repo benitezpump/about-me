@@ -138,7 +138,10 @@ class SiteContent
             'teaching' => $experiences->where('kind', 'teaching')->map(fn ($e) => $this->experience($e))->values()->all(),
             'personalProjects' => $personal->map(fn ($p) => $this->project($p))->all(),
             'education' => Education::orderBy('position')->orderBy('id')->get()
-                ->map(fn ($e) => (object) ['title' => $e->title, 'institution' => $e->institution, 'periodLabel' => $e->period_label])->all(),
+                ->map(fn ($e) => (object) [
+                    'title' => $e->title, 'institution' => $e->institution, 'periodLabel' => $e->period_label,
+                    'professionalLicense' => $e->professional_license,
+                ])->all(),
             'certificationGroups' => CertificationGroup::with('certifications')->orderBy('position')->orderBy('id')->get()
                 ->map(fn ($g) => (object) [
                     'title' => $g->title,

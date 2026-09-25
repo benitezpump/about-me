@@ -114,6 +114,17 @@ final class Reader
         return $s;
     }
 
+    /** Cédula profesional: opcional, solo dígitos (6 a 10). Va como texto: un número perdería ceros a la izquierda. */
+    public function professionalLicense(string $key): ?string
+    {
+        $s = $this->nullableText($key);
+        if ($s !== null && preg_match('/^[0-9]{6,10}$/', $s) !== 1) {
+            $this->fail($key, 'la cédula profesional debe llevar solo números (de 6 a 10 dígitos)');
+        }
+
+        return $s;
+    }
+
     public function year(string $key): int
     {
         $v = $this->data[$key] ?? null;

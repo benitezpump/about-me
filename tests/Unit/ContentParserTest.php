@@ -81,6 +81,29 @@ class ContentParserTest extends TestCase
         $this->assertSame($original, ContentSerializer::serialize($parsed->data));
     }
 
+    public function test_la_cedula_profesional_es_opcional_solo_digitos_y_solo_se_serializa_si_existe(): void
+    {
+        $con = $this->minimal() + ['education' => [
+            ['title' => 'Ing.', 'period_label' => '2014', 'professional_license' => ' 1234567 '],
+            ['title' => 'Maestría', 'period_label' => '2019'],
+            ['title' => 'Otro', 'period_label' => '2020', 'professional_license' => ''],
+        ]];
+        $r = (new ContentParser)->parse($con);
+
+        $this->assertTrue($r->ok, implode("
+", $r->issues));
+        $this->assertSame(['1234567', null, null], array_column($r->data['education'], 'professional_license'));
+
+        $texto = ContentSerializer::serialize($r->data);
+        $this->assertSame(1, substr_count($texto, 'professional_license'), 'solo el estudio que la tiene la lleva');
+        $this->assertSame($r->data, ContentParser::parseText($texto)->data, 'ida y vuelta');
+
+        foreach (['12345', '12345678901', 'ABC1234567', '123-456-7', 1234567] as $mala) {
+            $issues = $this->joined($this->minimal() + ['education' => [['title' => 'x', 'period_label' => 'p', 'professional_license' => $mala]]]);
+            $this->assertStringContainsString('education[0].professional_license', $issues, 'rechaza '.var_export($mala, true));
+        }
+    }
+
     public function test_cada_experiencia_solo_lleva_las_listas_de_su_tipo(): void
     {
         $out = json_decode(ContentSerializer::serialize(ContentParser::parseText((string) file_get_contents($this->example()))->data), true);
