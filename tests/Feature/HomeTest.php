@@ -17,6 +17,19 @@ class HomeTest extends TestCase
         return $this->get('/')->assertOk()->getContent();
     }
 
+    public function test_la_cedula_profesional_sale_solo_en_el_estudio_que_la_tiene(): void
+    {
+        Fixture::insert();
+        DB::table('education')->insert(['title' => 'Maestría', 'institution' => 'Instituto Ejemplo', 'period_label' => '2019 – 2021', 'professional_license' => '7654321', 'position' => 1]);
+        SiteContent::forget();
+
+        $html = $this->get('/', ['User-Agent' => ''])->assertOk()->getContent();
+
+        $this->assertSame(1, substr_count($html, 'Cédula profesional'));
+        $this->assertStringContainsString('Cédula profesional 7654321.</dd>', $html);
+        $this->assertStringContainsString('Universidad Ejemplo.</dd>', $html, 'el estudio sin cédula queda como antes');
+    }
+
     public function test_muestra_el_perfil_y_los_parrafos_de_la_introduccion(): void
     {
         Fixture::insert();

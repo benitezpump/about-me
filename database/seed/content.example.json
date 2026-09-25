@@ -155,7 +155,7 @@
     }
   ],
   "education": [
-    { "title": "Ingeniería en Sistemas", "institution": "Universidad Ejemplo", "period_label": "2014 – 2018" }
+    { "title": "Ingeniería en Sistemas", "institution": "Universidad Ejemplo", "period_label": "2014 – 2018", "professional_license": "1234567" }
   ],
   "certification_groups": [
     {

@@ -16,6 +16,7 @@ class EducationTable
                 TextColumn::make('title')->label('Estudio')->searchable(),
                 TextColumn::make('institution')->label('Institución'),
                 TextColumn::make('period_label')->label('Periodo'),
+                TextColumn::make('professional_license')->label('Cédula')->placeholder('—'),
             ])
             ->defaultSort('position')
             ->recordActions([

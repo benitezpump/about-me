@@ -160,7 +160,7 @@
         @if (count($education))
         <div class="group">
           <dl class="rows">
-            @foreach ($education as $e)<div><dt>{{ $e->periodLabel }}</dt><dd><strong class="strong-text">{{ $e->title }}</strong>@if ($e->institution), {{ $e->institution }}@endif.</dd></div>
+            @foreach ($education as $e)<div><dt>{{ $e->periodLabel }}</dt><dd><strong class="strong-text">{{ $e->title }}</strong>@if ($e->institution), {{ $e->institution }}@endif.@if ($e->professionalLicense) Cédula profesional {{ $e->professionalLicense }}.@endif</dd></div>
             @endforeach
           </dl>
         </div>

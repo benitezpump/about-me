@@ -23,4 +23,6 @@ class Education extends Model
 
     /** Columnas `not null default ''`: Filament guarda un texto vacío como NULL. */
     protected array $emptyStrings = ['institution'];
+
+    // `professional_license` sí admite NULL: sin cédula queda vacío en la base (Filament ya guarda '' como NULL).
 }

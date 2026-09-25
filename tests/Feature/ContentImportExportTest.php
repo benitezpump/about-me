@@ -174,7 +174,7 @@ class ContentImportExportTest extends TestCase
             'project_technologies' => ['project_id', 'technology_id', 'note'],
             'courses' => ['experience_id', 'subject', 'start_date', 'end_date'],
             'workshops' => ['experience_id', 'name', 'period_label', 'sort_date'],
-            'education' => ['title', 'institution', 'period_label'],
+            'education' => ['title', 'institution', 'period_label', 'professional_license'],
             'certification_groups' => ['title'],
             'certifications' => ['group_id', 'name', 'issuer', 'year', 'note', 'url'],
         ];

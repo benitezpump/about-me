@@ -7,6 +7,8 @@ use App\Filament\Resources\Certifications\Pages\ListCertifications;
 use App\Filament\Resources\CertificationGroups\Pages\ListCertificationGroups;
 use App\Filament\Resources\ContactLinks\Pages\CreateContactLink;
 use App\Filament\Resources\Courses\Pages\CreateCourse;
+use App\Filament\Resources\Education\Pages\CreateEducation;
+use App\Filament\Resources\Education\Pages\EditEducation;
 use App\Filament\Resources\Experiences\Pages\CreateExperience;
 use App\Filament\Resources\Experiences\Pages\EditExperience;
 use App\Filament\Resources\Experiences\Pages\ListExperiences;
@@ -403,6 +405,38 @@ class AdminContentTest extends TestCase
         $html = $this->home();
         $this->assertStringContainsString('<dd>Sistemas operativos</dd>', $html);
         $this->assertStringContainsString('<dt>01 – 03 mar 2026</dt><dd>Git</dd>', $html);
+    }
+
+    // ---------------------------------------------------------------------------------------------- Estudios ----
+
+    public function test_un_estudio_puede_llevar_cedula_profesional_pero_es_opcional_y_solo_numeros(): void
+    {
+        Fixture::insert();
+
+        Livewire::test(CreateEducation::class)
+            ->fillForm(['title' => 'Sin cédula', 'period_label' => '2010', 'position' => 5])
+            ->call('create')->assertHasNoFormErrors();
+        $this->assertNull(DB::table('education')->where('title', 'Sin cédula')->value('professional_license'));
+
+        foreach (['12345', 'ABC1234567', '1234-567'] as $mala) {
+            Livewire::test(CreateEducation::class)
+                ->fillForm(['title' => 'Mala', 'period_label' => '2011', 'professional_license' => $mala, 'position' => 6])
+                ->call('create')->assertHasFormErrors(['professional_license']);
+        }
+        $this->assertSame(0, DB::table('education')->where('title', 'Mala')->count());
+
+        Livewire::test(CreateEducation::class)
+            ->fillForm(['title' => 'Con cédula', 'period_label' => '2012', 'professional_license' => '9876543', 'position' => 7])
+            ->call('create')->assertHasNoFormErrors();
+        $this->assertStringContainsString('Cédula profesional 9876543.', $this->home());
+
+        // Borrar el campo al editar la deja en NULL (no '') y desaparece del sitio.
+        $id = DB::table('education')->where('title', 'Con cédula')->value('id');
+        Livewire::test(EditEducation::class, ['record' => $id])
+            ->fillForm(['professional_license' => ''])
+            ->call('save')->assertHasNoFormErrors();
+        $this->assertNull(DB::table('education')->where('id', $id)->value('professional_license'));
+        $this->assertStringNotContainsString('Cédula profesional', $this->home());
     }
 
     // ------------------------------------------------------------------------------------ Certificaciones ----

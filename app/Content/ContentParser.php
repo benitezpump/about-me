@@ -111,8 +111,9 @@ final class ContentParser
             fn (Reader $r) => $this->experience($r),
         );
         $personal = $top->list('personal_projects', self::PROJECT_KEYS, fn (Reader $r) => $this->project($r));
-        $education = $top->list('education', ['title', 'institution', 'period_label'], fn (Reader $r) => [
+        $education = $top->list('education', ['title', 'institution', 'period_label', 'professional_license'], fn (Reader $r) => [
             'title' => $r->text('title', true), 'institution' => $r->text('institution'), 'period_label' => $r->text('period_label', true),
+            'professional_license' => $r->professionalLicense('professional_license'),
         ]);
         $certificationGroups = $top->list('certification_groups', ['title', 'items'], fn (Reader $r) => [
             'title' => $r->text('title', true),
