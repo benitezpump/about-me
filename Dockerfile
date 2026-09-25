@@ -46,6 +46,12 @@ COPY --chmod=755 docker/entrypoint.sh /usr/local/bin/entrypoint
 RUN mkdir -p /data/caddy /config/caddy \
  && chown -R www-data:www-data /data /config /app/storage /app/bootstrap/cache
 
+# La imagen base le da a `frankenphp` la capacidad de abrir puertos menores a 1024 (atributo de archivo `cap_net_bind_service=+ep`).
+# Aquí se escucha en el 10000, así que no hace falta, y estorba: en las plataformas que quitan esa capacidad del contenedor
+# (Render) el kernel se niega a ejecutar el binario ("frankenphp: Operation not permitted", estado 126). Se quita copiando el
+# archivo: `cp` no lleva consigo los atributos extendidos, que es donde el kernel guarda las capacidades.
+RUN cp /usr/local/bin/frankenphp /usr/local/bin/frankenphp.copy  && mv -f /usr/local/bin/frankenphp.copy /usr/local/bin/frankenphp  && chmod 755 /usr/local/bin/frankenphp
+
 USER www-data
 EXPOSE 10000
 

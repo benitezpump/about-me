@@ -39,6 +39,12 @@ services:
       # false en local (http://localhost); true detrás de HTTPS.
       SESSION_SECURE_COOKIE: ${SESSION_SECURE_COOKIE:-false}
       TRUST_PROXY: ${TRUST_PROXY:-}
+    # Sin capacidades de Linux y sin poder ganar privilegios: es lo que hacen plataformas como Render, y así la integración
+    # continua detecta a tiempo un binario que solo arranca con privilegios de más (así falló el primer despliegue).
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
     ports:
       # Solo tu equipo: sin la dirección 127.0.0.1 Docker publicaría el puerto en TODAS las interfaces de tu red.
       - "127.0.0.1:${APP_PORT:-8080}:10000"
