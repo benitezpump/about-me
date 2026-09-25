@@ -84,7 +84,7 @@ class ContentImportExportTest extends TestCase
 
         $this->assertSame(1, DB::table('technologies')->whereRaw("lower(name) = 'node.js'")->count());
         $this->assertSame('Node.js', DB::table('technologies')->whereRaw("lower(name) = 'node.js'")->value('name'), 'gana la primera escritura');
-        $this->assertStringContainsString('<p class="stack">Node.js, Zig (nueva).</p>', $this->home());
+        $this->assertStringContainsString('<ul class="stack chips" aria-label="Tecnologías"><li>Node.js</li><li>Zig (nueva)</li></ul>', $this->home());
     }
 
     public function test_reemplazar_borra_lo_que_no_viene_invalida_la_cache_y_no_toca_administradores_ni_visitas(): void

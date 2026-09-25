@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="dark light">
-<meta name="theme-color" content="#0e1320">
+<meta name="theme-color" content="#09090b">
 <script src="/static/js/theme-init.js"></script>
 <title>{{ $profile->siteTitle }}</title>
 <meta name="description" content="{{ $profile->metaDescription }}">

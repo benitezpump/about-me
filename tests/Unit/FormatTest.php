@@ -56,15 +56,15 @@ class FormatTest extends TestCase
         $this->assertSame('', Format::displayUrl(null));
     }
 
-    public function test_linea_de_tecnologias_sale_del_catalogo_y_el_texto_libre_es_solo_respaldo(): void
+    public function test_las_tecnologias_salen_del_catalogo_una_por_etiqueta_con_su_nota(): void
     {
         $this->assertSame(
-            'PHP, Laravel, Browsershot (generación de PDF).',
-            Format::stackLine([
+            ['PHP', 'Laravel', 'Browsershot (generación de PDF)'],
+            Format::stackItems([
                 ['name' => 'PHP', 'note' => null], ['name' => 'Laravel', 'note' => ''],
                 ['name' => 'Browsershot', 'note' => 'generación de PDF'],
-            ], 'ignorado'),
+            ]),
         );
-        $this->assertSame('Texto heredado.', Format::stackLine([], 'Texto heredado.'));
+        $this->assertSame([], Format::stackItems([]));
     }
 }

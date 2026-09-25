@@ -17,8 +17,8 @@ class InitialsAvatar implements AvatarProvider
     {
         $name = (string) ($record->username ?? $record->getKey());
         $initials = e(Format::initials($name) ?: '?');
-        $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="#0e1320"/>'
-            .'<text x="32" y="43" font-family="sans-serif" font-size="30" font-weight="700" text-anchor="middle" fill="#e2c48a">'
+        $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="#09090b"/>'
+            .'<text x="32" y="43" font-family="sans-serif" font-size="30" font-weight="700" text-anchor="middle" fill="#fbbf24">'
             .$initials.'</text></svg>';
 
         return 'data:image/svg+xml;base64,'.base64_encode($svg);

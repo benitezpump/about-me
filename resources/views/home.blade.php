@@ -82,7 +82,7 @@
               <h3>{{ $p->title }}</h3>
               @if ($p->description)<p class="desc">{{ $p->description }}</p>@endif
               <x-details :p="$p" />
-              @if ($p->stack)<p class="stack">{{ $p->stack }}</p>@endif
+              <x-stack :p="$p" />
             </li>
             @endforeach
           </ol>
@@ -144,7 +144,7 @@
             @endforeach
           </ul>
           @endif
-          @if ($p->stack)<p class="stack">{{ $p->stack }}</p>@endif
+          <x-stack :p="$p" />
         </article>
         @endforeach
       </div>

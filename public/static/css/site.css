@@ -1,34 +1,36 @@
 :root {
   color-scheme: dark;
-  --bg: #0e1320;
-  --surface: #151d32;
-  --text: #e9e7e1;
-  --dim: #cbc8bf;
-  --muted: #98a0b5;
-  --line: #262e45;
-  --tech: #b8c0d6;
-  --accent: #e2c48a;
-  --accent-hover: #f2dcad;
-  --on-accent: #1a1608;
+  --bg: #09090b;
+  --surface: #18181b;
+  --text: #fafafa;
+  --dim: #d4d4d8;
+  --muted: #a1a1aa;
+  --line: #27272a;
+  --tech: #d4d4d8;
+  --accent: #fbbf24;
+  --accent-hover: #fcd34d;
+  --on-accent: #09090b;
+  --glow: 16%;
 
   --sans: "Schibsted Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
   --gutter: 1.25rem;
 }
 
-/* Light theme: cool white with a dark amber accent, so the wheat identity keeps its contrast. */
+/* Same palette as the admin panel (Filament: zinc + amber). In light, amber-700/800 keep the link text at AA contrast. */
 :root[data-theme="light"] {
   color-scheme: light;
-  --bg: #f6f7fa;
-  --surface: #ebeef5;
-  --text: #14182a;
-  --dim: #343a52;
-  --muted: #586080;
-  --tech: #384270;
-  --line: #dce0eb;
-  --accent: #85570a;
-  --accent-hover: #653f00;
+  --bg: #fafafa;
+  --surface: #f4f4f5;
+  --text: #09090b;
+  --dim: #3f3f46;
+  --muted: #52525b;
+  --tech: #3f3f46;
+  --line: #e4e4e7;
+  --accent: #b45309;
+  --accent-hover: #92400e;
   --on-accent: #ffffff;
+  --glow: 10%;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -144,7 +146,10 @@ section[id] { scroll-margin-top: 4.5rem; }
 
 .hero {
   padding-block: clamp(3rem, 8vw, 5.5rem) clamp(3.5rem, 8vw, 5.5rem);
-  background: var(--surface);
+  /* Resplandor ámbar detrás del título, sobre la superficie del tema. */
+  background:
+    radial-gradient(48rem 26rem at 12% -8%, color-mix(in srgb, var(--accent) var(--glow), transparent), transparent 70%),
+    var(--surface);
 }
 
 h1 {
@@ -208,6 +213,17 @@ h3 { font-size: 1.25rem; font-weight: 650; letter-spacing: -.01em; line-height: 
 .stack { font: 400 .8125rem/1.7 var(--mono); color: var(--tech); }
 .desc { color: var(--dim); max-width: 62ch; }
 
+/* Tecnologías de un proyecto: una etiqueta por tecnología. */
+.chips { display: flex; flex-wrap: wrap; gap: .375rem; }
+.chips li {
+  padding: .1875rem .6875rem;
+  background: var(--chip-bg, var(--surface));
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font: 400 .75rem/1.6 var(--mono);
+  color: var(--tech);
+}
+
 @media (min-width: 52rem) {
   :root { --gutter: 2rem; }
   .sec .wrap { grid-template-columns: 12rem minmax(0, 1fr); gap: 3rem; }
@@ -215,7 +231,8 @@ h3 { font-size: 1.25rem; font-weight: 650; letter-spacing: -.01em; line-height: 
 }
 
 /* Work: a real sequence, so a real timeline. */
-.timeline { border-left: 1px solid var(--line); }
+/* El hilo nace ámbar arriba (lo más reciente) y se apaga hacia lo antiguo. */
+.timeline { border-left: 1px solid; border-image: linear-gradient(to bottom, var(--accent), var(--line) 14rem) 1; }
 .timeline > li { position: relative; padding: 0 0 2.25rem 1.75rem; }
 .timeline > li:last-child { padding-bottom: 0; }
 .timeline > li::before {
@@ -229,10 +246,14 @@ h3 { font-size: 1.25rem; font-weight: 650; letter-spacing: -.01em; line-height: 
   background: var(--bg);
   border: 1px solid var(--muted);
 }
-.timeline > li.current::before { background: var(--accent); border-color: var(--accent); }
+.timeline > li.current::before {
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent), 0 0 14px color-mix(in srgb, var(--accent) 55%, transparent);
+}
 .timeline h3 { margin-top: .125rem; }
 .timeline .desc { margin-top: .25rem; }
-.timeline .stack { margin-top: .375rem; }
+.timeline .stack { margin-top: .625rem; }
 
 .intro { color: var(--dim); max-width: 62ch; margin-bottom: 2rem; }
 .intro strong { color: var(--text); font-weight: 620; }
@@ -253,11 +274,19 @@ h3 { font-size: 1.25rem; font-weight: 650; letter-spacing: -.01em; line-height: 
 .tools .emphasis dd { color: var(--text); }
 
 /* Personal projects */
-.project + .project { margin-top: 3rem; }
-.project ul, .timeline ul { margin-top: .875rem; max-width: 62ch; color: var(--dim); font-size: .9688rem; }
-.project ul li, .timeline ul li { position: relative; padding-left: 1.25rem; margin-top: .375rem; }
-.project ul li::before, .timeline ul li::before { content: ""; position: absolute; left: 0; top: .8em; width: .6rem; height: 1px; background: var(--muted); }
-.timeline ul li strong { color: var(--text); font-weight: 620; }
+.project {
+  padding: 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  transition: border-color .2s, box-shadow .2s;
+  --chip-bg: var(--bg);
+}
+.project + .project { margin-top: 1.25rem; }
+.project ul:not(.chips), .timeline ul:not(.chips) { margin-top: .875rem; max-width: 62ch; color: var(--dim); font-size: .9688rem; }
+.project ul:not(.chips) li, .timeline ul:not(.chips) li { position: relative; padding-left: 1.25rem; margin-top: .375rem; }
+.project ul:not(.chips) li::before, .timeline ul:not(.chips) li::before { content: ""; position: absolute; left: 0; top: .8em; width: .6rem; height: 1px; background: var(--muted); }
+.timeline ul:not(.chips) li strong { color: var(--text); font-weight: 620; }
 
 /* Long achievement lists stay folded so the timeline reads at a glance. */
 .timeline details { margin-top: .625rem; }
@@ -278,7 +307,7 @@ h3 { font-size: 1.25rem; font-weight: 650; letter-spacing: -.01em; line-height: 
 .timeline summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
 .timeline details ul { margin-top: .625rem; margin-bottom: .25rem; }
 .timeline details[open] ul { background: var(--surface); border-radius: 8px; padding: .875rem 1rem .875rem .875rem; }
-.project .stack { margin-top: .875rem; }
+.project .stack { margin-top: 1.125rem; }
 .project h3 { margin-top: .125rem; }
 .project .desc { margin-top: .375rem; }
 
@@ -291,6 +320,7 @@ h3 { font-size: 1.25rem; font-weight: 650; letter-spacing: -.01em; line-height: 
   border-radius: 10px;
   padding: 1.5rem;
   align-self: end;
+  transition: border-color .2s, box-shadow .2s;
 }
 .now-panel h2 { font-size: 1.0625rem; margin-bottom: 1.25rem; }
 .now-panel .item + .item { margin-top: 1.25rem; }
@@ -301,6 +331,13 @@ h3 { font-size: 1.25rem; font-weight: 650; letter-spacing: -.01em; line-height: 
   .hero .wrap { grid-template-columns: minmax(0, 1fr) 19rem; gap: 3rem; align-items: start; }
   .hero h1 { font-size: 4.25rem; }
   .now-panel { align-self: start; margin-top: 1rem; }
+}
+
+@media (hover: hover) {
+  .now-panel:hover, .project:hover {
+    border-color: color-mix(in srgb, var(--accent) 55%, var(--line));
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 25%, transparent), 0 10px 32px -14px color-mix(in srgb, var(--accent) 45%, transparent);
+  }
 }
 
 .cta .more { color: var(--text); text-decoration-color: var(--line); }
@@ -355,6 +392,10 @@ h3 { font-size: 1.25rem; font-weight: 650; letter-spacing: -.01em; line-height: 
 @media print {
   :root { --bg: #fff; --text: #111; --dim: #222; --muted: #555; --line: #ccc; --accent: #111; }
   .top { display: none; }
+  .hero { background: none; }
+  .project, .now-panel { background: none; box-shadow: none; }
+  .chips li { background: none; }
+  .timeline > li.current::before { box-shadow: none; }
   .btn { border: 1px solid #111; background: none; color: #111; }
 }
 
